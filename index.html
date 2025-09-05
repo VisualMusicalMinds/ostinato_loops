@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rhythmic Poetry Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="poem"></div>
+
+  <!-- Floating bottom panel -->
+  <div class="floating-panel" id="floating-panel">
+    <div class="play-button" id="play-button">▶</div>
+
+    <div class="control-button" id="bpm-button">
+      <span id="bpm-value">82</span>&nbsp;BPM
+    </div>
+
+    <div class="audio-controls">
+      <div class="checkbox-row beat">
+        <input type="checkbox" id="beat-checkbox" checked>
+        <label for="beat-checkbox">Beat</label>
+      </div>
+      <div class="checkbox-row rhythm">
+        <input type="checkbox" id="rhythm-checkbox" checked>
+        <label for="rhythm-checkbox">Rhythm</label>
+      </div>
+    </div>
+
+    <div class="control-button copy-visual-button" id="copy-visual-btn">📷</div>
+    
+    <div class="icon-button active" id="circle-icon">
+      <div class="icon-circles">
+        <div class="icon-circle"></div>
+        <div class="icon-circle"></div>
+      </div>
+    </div>
+  </div>
+  <button class="panel-toggle-button" id="panel-toggle-button"></button>
+
+  <div id="zoom-controls">
+    <button id="zoom-fab" class="fab zoom-button">🔍</button>
+    <button id="zoom-in-btn" class="fab zoom-button sub-button">+</button>
+    <button id="zoom-out-btn" class="fab zoom-button sub-button">-</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
