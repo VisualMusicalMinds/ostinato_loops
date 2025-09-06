@@ -124,7 +124,7 @@
   let syncopation = [[], [], [], []];
   let syncopationStates = [{}, {}, {}, {}];
   let editingIndex = { line: null, position: null };
-  let circleIconActive = true;
+  let beatBarIconActive = true;
   let timeSignatureNumerator = 4;
   let timeSignatureDenominator = 4;
   let hasPickupMeasure = false;
@@ -527,9 +527,9 @@
   // Circle icon button
   const circleIcon = document.getElementById('circle-icon');
   circleIcon.addEventListener('click', () => {
-    circleIconActive = !circleIconActive;
-    circleIcon.className = `icon-button ${circleIconActive ? 'active' : 'inactive'}`;
-    updateCircleVisibility();
+    beatBarIconActive = !beatBarIconActive;
+    circleIcon.className = `icon-button ${beatBarIconActive ? 'active' : 'inactive'}`;
+    updateBeatBarVisibility();
   });
 
   // BPM Control
@@ -652,9 +652,9 @@
     // No need to re-render, clearHighlights is enough.
   }
 
-  function updateCircleVisibility() {
-    document.querySelectorAll('.circles').forEach(box => {
-      box.classList.toggle('hidden', !circleIconActive);
+  function updateBeatBarVisibility() {
+    document.querySelectorAll('.beat-bar').forEach(box => {
+      box.classList.toggle('hidden', !beatBarIconActive);
     });
   }
 
@@ -764,24 +764,24 @@
     const group = document.createElement('div');
     group.className = 'group';
 
-    const circlesDiv = document.createElement('div');
-    circlesDiv.className = 'circles';
-    if (!circleIconActive) circlesDiv.classList.add('hidden');
+    const beatBarDiv = document.createElement('div');
+    beatBarDiv.className = 'beat-bar';
+    if (!beatBarIconActive) beatBarDiv.classList.add('hidden');
 
     const activeStates = [];
     for (let circleIndex = 0; circleIndex < config.circlesPerBeat; circleIndex++) {
         const idx = beatStartPosition + circleIndex;
-        const circle = document.createElement('span');
-        circle.className = 'circle';
+        const half = document.createElement('div');
+        half.className = 'beat-bar-half';
+        
         const isActive = isPositionActive(lineIndex, idx, displayWords);
         activeStates.push(isActive);
 
-        if (syncopation[lineIndex].includes(idx)) {
-            circle.classList.add('syncopated');
-        } else if (isActive) {
-            circle.classList.add('active');
+        if (isActive) {
+            half.classList.add('active');
         }
-        circle.addEventListener('click', () => {
+
+        half.addEventListener('click', () => {
             if (words[lineIndex][idx] === '-' || words[lineIndex][idx] === '') {
                 words[lineIndex][idx] = 'word'; // Placeholder
             } else {
@@ -789,9 +789,9 @@
             }
             render();
         });
-        circlesDiv.appendChild(circle);
+        beatBarDiv.appendChild(half);
     }
-    group.appendChild(circlesDiv);
+    group.appendChild(beatBarDiv);
 
     const notesBox = document.createElement('div');
     notesBox.className = 'notes-box';
