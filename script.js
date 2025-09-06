@@ -814,43 +814,37 @@
 
     const wordsDiv = document.createElement('div');
     wordsDiv.className = 'words';
-    for (let circleIndex = 0; circleIndex < config.circlesPerBeat; circleIndex++) {
-        const idx = beatStartPosition + circleIndex;
-        const wc = document.createElement('span');
-        wc.className = 'word-container';
 
-        if (editingIndex.line === lineIndex && editingIndex.position === idx) {
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = displayWords[idx];
-            input.className = 'word-input';
-            wc.appendChild(input);
-            wordsDiv.appendChild(wc);
-            setTimeout(() => { input.focus(); input.select(); });
+    // Determine the pattern from the two active states for this beat.
+    const pattern = (activeStates[0] ? 'O' : 'G') + (activeStates[1] ? 'O' : 'G');
 
-            input.addEventListener('keydown', (e) => onKey(e, lineIndex, idx, input));
-            input.addEventListener('blur', (e) => onBlur(e, lineIndex, idx, input));
-        } else {
-            const span = document.createElement('span');
-            const word = displayWords[idx];
-            if (isAffectedBySyncopation(lineIndex, idx) && !isPositionActive(lineIndex, idx, displayWords)) {
-                span.textContent = '';
-                span.className = 'word rest';
-            } else {
-                span.textContent = word || '';
-                span.className = 'word';
-                if (!word || word === '-') {
-                    span.classList.add('rest');
-                }
-            }
-            span.addEventListener('click', () => {
-                editingIndex = { line: lineIndex, position: idx };
-                render();
-            });
-            wc.appendChild(span);
-            wordsDiv.appendChild(wc);
-        }
+    let textContent = '';
+    let isRest = false;
+
+    switch (pattern) {
+        case 'OG': // Ta
+            textContent = 'Ta';
+            break;
+        case 'OO': // Ti - Ti
+            textContent = 'Ti - Ti';
+            break;
+        case 'GO': // - ti
+            textContent = '- ti';
+            break;
+        case 'GG': // -
+            textContent = '-';
+            isRest = true;
+            break;
     }
+
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.textContent = textContent;
+    if (isRest) {
+        span.classList.add('rest');
+    }
+
+    wordsDiv.appendChild(span);
     group.appendChild(wordsDiv);
     return group;
   }
