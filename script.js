@@ -188,8 +188,10 @@
   function createSnareDrum() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
+      const decayTime = 0.4;
+
       // White noise component
-      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * decayTime, ctx.sampleRate);
       const output = noiseBuffer.getChannelData(0);
       for (let i = 0; i < noiseBuffer.length; i++) {
           output[i] = Math.random() * 2 - 1;
@@ -197,27 +199,47 @@
       const noise = ctx.createBufferSource();
       noise.buffer = noiseBuffer;
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(1, ctx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+      noiseGain.gain.setValueAtTime(0, ctx.currentTime);
+      noiseGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
       
       // Tonal component
       const osc = ctx.createOscillator();
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(100, ctx.currentTime);
       const oscGain = ctx.createGain();
-      oscGain.gain.setValueAtTime(0.7, ctx.currentTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      oscGain.gain.setValueAtTime(0, ctx.currentTime);
+      oscGain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.01);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime / 2);
+
+      // New bass component
+      const bassOsc = ctx.createOscillator();
+      bassOsc.type = 'sine';
+      bassOsc.frequency.setValueAtTime(60, ctx.currentTime);
+      const bassGain = ctx.createGain();
+      bassGain.gain.setValueAtTime(0, ctx.currentTime);
+      bassGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.01);
+      bassGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
       
       noise.connect(noiseGain);
       osc.connect(oscGain);
+      bassOsc.connect(bassGain);
+
       noiseGain.connect(analyser);
       oscGain.connect(analyser);
+      bassGain.connect(analyser);
+
       noiseGain.connect(ctx.destination);
       oscGain.connect(ctx.destination);
+      bassGain.connect(ctx.destination);
+
       noise.start();
       osc.start();
-      noise.stop(ctx.currentTime + 0.2);
-      osc.stop(ctx.currentTime + 0.2);
+      bassOsc.start();
+
+      noise.stop(ctx.currentTime + decayTime);
+      osc.stop(ctx.currentTime + decayTime);
+      bassOsc.stop(ctx.currentTime + decayTime);
   }
 
   // Sound 3: Tom Drum
@@ -242,45 +264,65 @@
   function createHandClap() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
-      const bufferSize = ctx.sampleRate * 0.2;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-          output[i] = Math.random() * 2 - 1;
+      const decayTime = 1.5;
+
+      // We'll create multiple short bursts of noise
+      const burstCount = 3 + Math.floor(Math.random() * 2); // 3 or 4 bursts
+
+      for (let i = 0; i < burstCount; i++) {
+          const bufferSize = ctx.sampleRate * 0.1; // Short burst
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const output = buffer.getChannelData(0);
+          for (let j = 0; j < bufferSize; j++) {
+              output[j] = Math.random() * 2 - 1;
+          }
+
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          // Randomize filter frequency slightly for each burst
+          filter.frequency.value = 1500 + (Math.random() - 0.5) * 500;
+          filter.Q.value = 1;
+
+          const envelope = ctx.createGain();
+          
+          // Each burst has its own envelope
+          const startTime = ctx.currentTime + i * (0.02 + Math.random() * 0.015);
+          const randomGain = 0.5 + Math.random() * 0.5;
+
+          envelope.gain.setValueAtTime(0, startTime);
+          envelope.gain.linearRampToValueAtTime(randomGain, startTime + 0.02);
+          envelope.gain.exponentialRampToValueAtTime(0.01, startTime + decayTime);
+
+          noise.connect(filter);
+          filter.connect(envelope);
+          envelope.connect(analyser);
+          envelope.connect(ctx.destination);
+
+          noise.start(startTime);
+          noise.stop(startTime + decayTime);
       }
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 1500;
-      filter.Q.value = 1;
-      const envelope = ctx.createGain();
-      envelope.gain.setValueAtTime(0, ctx.currentTime);
-      envelope.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
-      envelope.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.03);
-      envelope.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.06);
-      envelope.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
-      noise.connect(filter);
-      filter.connect(envelope);
-      envelope.connect(analyser);
-      envelope.connect(ctx.destination);
-      noise.start();
-      noise.stop(ctx.currentTime + 0.2);
   }
 
   // Sound 5: Claves
   function createClaves() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
+      const baseFrequency = 2500;
+      const decayTime = 0.15;
+
+      // --- Original Oscillator ---
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.value = 2500;
+      osc.frequency.value = baseFrequency;
       gain.gain.setValueAtTime(0, ctx.currentTime);
       gain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.001);
       gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-      
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
+
       const distortion = ctx.createWaveShaper();
       function makeDistortionCurve(amount) {
           const k = typeof amount === 'number' ? amount : 50;
@@ -294,16 +336,44 @@
       }
       distortion.curve = makeDistortionCurve(200);
       distortion.oversample = '4x';
-      
+
       const filter = ctx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.value = 2500;
+      filter.frequency.value = baseFrequency;
       filter.Q.value = 8;
       const filter2 = ctx.createBiquadFilter();
       filter2.type = 'peaking';
       filter2.frequency.value = 800;
       filter2.gain.value = 3;
       filter2.Q.value = 2;
+
+      // --- Reinforcement Oscillators ---
+      const freqs = [
+          baseFrequency / 2,            // Octave below
+          baseFrequency * 8 / 9,        // Major second below
+          (baseFrequency * 8 / 9) / 2   // Major second below, octave lower
+      ];
+
+      const reinforcementGains = [0.15, 0.1, 0.08]; // Quiet gain levels
+
+      freqs.forEach((freq, i) => {
+          const reinfOsc = ctx.createOscillator();
+          reinfOsc.type = 'sine';
+          reinfOsc.frequency.value = freq;
+          
+          const reinfGain = ctx.createGain();
+          reinfGain.gain.setValueAtTime(0, ctx.currentTime);
+          reinfGain.gain.linearRampToValueAtTime(reinforcementGains[i], ctx.currentTime + 0.001);
+          reinfGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
+
+          reinfOsc.connect(reinfGain);
+          reinfGain.connect(analyser);
+          reinfGain.connect(ctx.destination);
+          reinfOsc.start();
+          reinfOsc.stop(ctx.currentTime + decayTime);
+      });
+
+      // --- Master Gain and Connections ---
       const masterGain = ctx.createGain();
       masterGain.gain.value = 0.6;
       
@@ -315,14 +385,15 @@
       masterGain.connect(analyser);
       masterGain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.15);
+      osc.stop(ctx.currentTime + decayTime);
   }
 
   // Sound 6: Hi-Hat
   function createHiHat() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
-      const bufferSize = ctx.sampleRate * 0.1;
+      const decayTime = 0.3;
+      const bufferSize = ctx.sampleRate * decayTime;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const output = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
@@ -330,23 +401,21 @@
       }
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 8000;
-      filter.Q.value = 0.5;
+      
       const highpass = ctx.createBiquadFilter();
       highpass.type = 'highpass';
-      highpass.frequency.value = 7000;
+      highpass.frequency.value = 8000; // Higher frequency for a 'tissy' hi-hat sound
+      
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-      noise.connect(filter);
-      filter.connect(highpass);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime); // Increased gain
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
+      
+      noise.connect(highpass);
       highpass.connect(gain);
       gain.connect(analyser);
       gain.connect(ctx.destination);
       noise.start();
-      noise.stop(ctx.currentTime + 0.08);
+      noise.stop(ctx.currentTime + decayTime);
   }
 
   // Sound 7: Crash Cymbal
@@ -393,7 +462,7 @@
       filter.Q.value = 2;
       const envelope = ctx.createGain();
       envelope.gain.setValueAtTime(0, ctx.currentTime);
-      envelope.gain.linearRampToValueAtTime(0.8, ctx.currentTime + 0.01);
+      envelope.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.005); // Louder and stronger attack
       envelope.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
       noise.connect(filter);
       filter.connect(envelope);
