@@ -120,6 +120,8 @@
 
   const initialLine = () => Array(8).fill('-');
   let words = [initialLine(), initialLine(), initialLine(), initialLine()];
+  let lineSoundIndexes = [0, 1, 2, 3]; // Default sounds for each line
+  let lineMutedState = [false, false, false, false]; // Mute state for each line
   
   let syncopation = [[], [], [], []];
   let syncopationStates = [{}, {}, {}, {}];
@@ -152,6 +154,265 @@
     return audioContext;
   }
 
+  // --- SOUND LIBRARY ---
+
+  let analyser; // Keep a reference to the analyser
+
+  function setupAnalyser(ctx) {
+      if (!analyser) {
+          analyser = ctx.createAnalyser();
+          // Optional: connect analyser to destination to hear the sounds
+          // analyser.connect(ctx.destination); 
+      }
+      return analyser;
+  }
+
+  // Sound 1: Bass Drum (Kick)
+  function createBassDrum() {
+      const ctx = initAudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const analyser = setupAnalyser(ctx);
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.connect(gain);
+      gain.connect(analyser);
+      gain.connect(ctx.destination); // Connect to output
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+  }
+
+  // Sound 2: Snare Drum
+  function createSnareDrum() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      // White noise component
+      const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.2, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < noiseBuffer.length; i++) {
+          output[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(1, ctx.currentTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+      
+      // Tonal component
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(100, ctx.currentTime);
+      const oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(0.7, ctx.currentTime);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      
+      noise.connect(noiseGain);
+      osc.connect(oscGain);
+      noiseGain.connect(analyser);
+      oscGain.connect(analyser);
+      noiseGain.connect(ctx.destination);
+      oscGain.connect(ctx.destination);
+      noise.start();
+      osc.start();
+      noise.stop(ctx.currentTime + 0.2);
+      osc.stop(ctx.currentTime + 0.2);
+  }
+
+  // Sound 3: Tom Drum
+  function createTomDrum() {
+      const ctx = initAudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const analyser = setupAnalyser(ctx);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(analyser);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+  }
+
+  // Sound 4: Hand Clap
+  function createHandClap() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      const bufferSize = ctx.sampleRate * 0.2;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1500;
+      filter.Q.value = 1;
+      const envelope = ctx.createGain();
+      envelope.gain.setValueAtTime(0, ctx.currentTime);
+      envelope.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
+      envelope.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.03);
+      envelope.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.06);
+      envelope.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+      noise.connect(filter);
+      filter.connect(envelope);
+      envelope.connect(analyser);
+      envelope.connect(ctx.destination);
+      noise.start();
+      noise.stop(ctx.currentTime + 0.2);
+  }
+
+  // Sound 5: Claves
+  function createClaves() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 2500;
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.001);
+      gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+      
+      const distortion = ctx.createWaveShaper();
+      function makeDistortionCurve(amount) {
+          const k = typeof amount === 'number' ? amount : 50;
+          const n_samples = 44100;
+          const curve = new Float32Array(n_samples);
+          for (let i = 0; i < n_samples; i++) {
+              const deg = Math.PI * i / n_samples;
+              curve[i] = ((3 + k) * deg) / (Math.PI + k * Math.abs(deg));
+          }
+          return curve;
+      }
+      distortion.curve = makeDistortionCurve(200);
+      distortion.oversample = '4x';
+      
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 2500;
+      filter.Q.value = 8;
+      const filter2 = ctx.createBiquadFilter();
+      filter2.type = 'peaking';
+      filter2.frequency.value = 800;
+      filter2.gain.value = 3;
+      filter2.Q.value = 2;
+      const masterGain = ctx.createGain();
+      masterGain.gain.value = 0.6;
+      
+      osc.connect(filter);
+      filter.connect(filter2);
+      filter2.connect(distortion);
+      distortion.connect(gain);
+      gain.connect(masterGain);
+      masterGain.connect(analyser);
+      masterGain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+  }
+
+  // Sound 6: Hi-Hat
+  function createHiHat() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      const bufferSize = ctx.sampleRate * 0.1;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 8000;
+      filter.Q.value = 0.5;
+      const highpass = ctx.createBiquadFilter();
+      highpass.type = 'highpass';
+      highpass.frequency.value = 7000;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+      noise.connect(filter);
+      filter.connect(highpass);
+      highpass.connect(gain);
+      gain.connect(analyser);
+      gain.connect(ctx.destination);
+      noise.start();
+      noise.stop(ctx.currentTime + 0.08);
+  }
+
+  // Sound 7: Crash Cymbal
+  function createCrashCymbal() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      const bufferSize = ctx.sampleRate * 1;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const highpass = ctx.createBiquadFilter();
+      highpass.type = 'highpass';
+      highpass.frequency.value = 5000;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.5, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
+      noise.connect(highpass);
+      highpass.connect(gain);
+      gain.connect(analyser);
+      gain.connect(ctx.destination);
+      noise.start();
+      noise.stop(ctx.currentTime + 1);
+  }
+
+  // Sound 8: Shaker
+  function createShaker() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      const bufferSize = ctx.sampleRate * 0.1;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 7000;
+      filter.Q.value = 2;
+      const envelope = ctx.createGain();
+      envelope.gain.setValueAtTime(0, ctx.currentTime);
+      envelope.gain.linearRampToValueAtTime(0.8, ctx.currentTime + 0.01);
+      envelope.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      noise.connect(filter);
+      filter.connect(envelope);
+      envelope.connect(analyser);
+      envelope.connect(ctx.destination);
+      noise.start();
+      noise.stop(ctx.currentTime + 0.1);
+  }
+
+  const soundBank = [
+    { name: 'Bass Drum', func: createBassDrum, image: 'https://visualmusicalminds.github.io/images/virtualdrums-bass.png' },
+    { name: 'Snare', func: createSnareDrum, image: 'https://visualmusicalminds.github.io/images/virtualdrums-snare.png' },
+    { name: 'Tom', func: createTomDrum, image: 'https://visualmusicalminds.github.io/images/virtualdrums-tom.png' },
+    { name: 'Hand Clap', func: createHandClap, image: 'https://visualmusicalminds.github.io/images/virtualdrums-clap.png' },
+    { name: 'Claves', func: createClaves, image: 'https://visualmusicalminds.github.io/images/virtualdrums-claves.png' },
+    { name: 'Hi-Hat', func: createHiHat, image: 'https://visualmusicalminds.github.io/images/virtualdrums-highhat.png' },
+    { name: 'Crash', func: createCrashCymbal, image: 'https://visualmusicalminds.github.io/images/virtualdrums-crash.png' },
+    { name: 'Shaker', func: createShaker, image: 'https://visualmusicalminds.github.io/images/virtualdrums-shaker.png' }
+  ];
 
   // Copy text to clipboard
   async function copyToClipboard(text) {
@@ -695,13 +956,20 @@
 
       // Schedule RHYTHM track for each line
       words.forEach((lineWords, lineIndex) => {
+        if (lineMutedState[lineIndex]) {
+          return; // Skip this line if it's muted
+        }
         const rhythmPattern = getRhythmPattern(lineIndex);
         rhythmPattern.forEach((hasSound, circleIndex) => {
           if (hasSound) {
             const timeDelay = circleIndex * noteInterval;
             playTimeouts.push(setTimeout(() => {
               if (isPlaying && rhythmEnabled) {
-                playTriangleTone(noteInterval * 0.8 / 1000);
+                const soundIndex = lineSoundIndexes[lineIndex];
+                const sound = soundBank[soundIndex];
+                if (sound && typeof sound.func === 'function') {
+                  sound.func();
+                }
               }
             }, timeDelay));
           }
@@ -1017,6 +1285,41 @@
     words.forEach((lineWords, lineIndex) => {
         const lineDiv = document.createElement('div');
         lineDiv.className = 'line';
+
+        const soundSelector = document.createElement('div');
+        soundSelector.className = 'sound-selector';
+
+        const prevButton = document.createElement('button');
+        prevButton.className = 'selector-button';
+        prevButton.textContent = '<';
+        prevButton.addEventListener('click', () => {
+            lineSoundIndexes[lineIndex] = (lineSoundIndexes[lineIndex] - 1 + soundBank.length) % soundBank.length;
+            render();
+        });
+
+        const soundImage = document.createElement('img');
+        soundImage.className = 'sound-image';
+        if (lineMutedState[lineIndex]) {
+            soundImage.classList.add('muted');
+        }
+        soundImage.src = soundBank[lineSoundIndexes[lineIndex]].image;
+        soundImage.addEventListener('click', () => {
+            lineMutedState[lineIndex] = !lineMutedState[lineIndex];
+            render();
+        });
+
+        const nextButton = document.createElement('button');
+        nextButton.className = 'selector-button';
+        nextButton.textContent = '>';
+        nextButton.addEventListener('click', () => {
+            lineSoundIndexes[lineIndex] = (lineSoundIndexes[lineIndex] + 1) % soundBank.length;
+            render();
+        });
+
+        soundSelector.appendChild(prevButton);
+        soundSelector.appendChild(soundImage);
+        soundSelector.appendChild(nextButton);
+        lineDiv.appendChild(soundSelector);
 
         const measureDiv = document.createElement('div');
         measureDiv.className = 'measure';
