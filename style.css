@@ -5,19 +5,35 @@ body { margin: 0; padding: 0; }
 .measure-divider { display: inline-block; width: 2px; background-color: #666; margin: 0 8px; vertical-align: top; position: relative; }
 .final-measure-divider { display: inline-block; width: 6px; background: linear-gradient(to right, #666 0%, #666 25%, transparent 25%, transparent 75%, #666 75%, #666 100%); margin: 0 8px; vertical-align: top; position: relative; }
 .group { display: inline-block; vertical-align: top; margin-right: 8px; text-align: center; }
-.notes-box { display: flex; justify-content: center; align-items: center; margin-bottom: 2px; border: none; padding: 4px; transition: background-color 0.1s ease; }
+.notes-box { display: flex; justify-content: center; align-items: center; margin-bottom: -4px; border: none; padding: 4px; transition: background-color 0.1s ease; }
 .notes-box.playing, .notes-box.selected { background-color: #ffff99; border-radius: 4px; }
 .notes-box svg, .notes-box img { margin: 0 4px; }
 .notes-box.compound svg, .notes-box.compound img { }
 .notes-box.sixteenth svg, .notes-box.sixteenth img { }
-.circles { display: flex; justify-content: center; margin-bottom: 2px; border: 1px solid #c0c0c0; padding: 4px 8px; background-color: #f5f5f5; border-radius: 8px; transition: opacity 0.3s ease; }
-.circles.hidden { opacity: 0; pointer-events: none; }
-.circles.pickup {
-    background-color: #90EE90; /* Brighter Green */
+.beat-bar {
+  display: flex;
+  height: 8px;
+  width: 40px;
+  background-color: #e0e0e0;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  margin: 0 auto 4px auto; /* Center the bar and give space below */
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
 }
-.circle { margin: 0 2px; border-radius: 50%; background-color: grey; cursor: pointer; }
-.circle.active { background-color: #007bff; }
-.circle.syncopated { background-color: #28a745; } /* Green for syncopated */
+.beat-bar.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.beat-bar-half {
+  width: 50%;
+  height: 100%;
+  transition: background-color 0.1s ease;
+}
+.beat-bar-half.active {
+  background-color: #ff8c00; /* Vibrant Orange */
+}
 .words { display: flex; justify-content: center; }
 .word-container { display: inline-block; margin: 0 4px; text-align: center; }
 .word, .word-input { display: block; cursor: pointer; }
@@ -146,23 +162,18 @@ body { margin: 0; padding: 0; }
   border: 1px solid #999; 
 }
 
-.icon-circles { 
-  display: flex; 
-  gap: 2px; 
+.icon-beat-bar {
+  width: 16px;
+  height: 6px;
+  border-radius: 2px;
 }
 
-.icon-circle { 
-  width: 8px; 
-  height: 8px; 
-  border-radius: 50%; 
+.icon-button.active .icon-beat-bar {
+  background-color: #ff8c00; /* Vibrant Orange */
 }
 
-.icon-button.active .icon-circle { 
-  background-color: #007bff; 
-}
-
-.icon-button.inactive .icon-circle { 
-  background-color: #999; 
+.icon-button.inactive .icon-beat-bar {
+  background-color: #999;
 }
 
 /* Time signature button */
