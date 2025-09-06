@@ -9,7 +9,7 @@ body { margin: 0; padding: 0; }
 .notes-box.playing, .notes-box.selected { background-color: #ffff99; border-radius: 4px; }
 .notes-box svg, .notes-box img { margin: 0 4px; }
 .notes-box.compound svg, .notes-box.compound img { }
-.notes-box.sixteenth svg, .notes-box.sixteenth img { }
+.notes-box.sixteenth svg, .notes-box.sixteenth img { width: 6em; }
 .beat-bar {
   display: flex;
   height: 8px;
@@ -25,6 +25,9 @@ body { margin: 0; padding: 0; }
 .beat-bar.hidden {
   opacity: 0;
   pointer-events: none;
+}
+.group.sixteenth .beat-bar {
+    width: 80px;
 }
 .beat-bar-half {
   width: 50%;
@@ -257,31 +260,12 @@ body { margin: 0; padding: 0; }
 }
 
 /* 16th Note Button */
-.sixteenth-note-button {
-    padding: 0 8px;
-}
-.sixteenth-note-button img {
-    height: 80%;
-    filter: grayscale(1);
-    opacity: 0.7;
-    transition: all 0.2s ease;
-}
-.sixteenth-note-button.active {
-    background-color: #28a745;
-}
-.sixteenth-note-button.active img {
-    filter: none;
-    opacity: 1;
-}
-.sixteenth-note-button.disabled {
-    cursor: not-allowed;
-    background-color: #f0f0f0;
-    border-color: #ccc;
-}
-.sixteenth-note-button.disabled img {
-    filter: grayscale(1);
-    opacity: 0.5;
-}
+.sixteenth-note-button { padding: 0 8px; }
+.sixteenth-note-button img { height: 80%; filter: grayscale(1); opacity: 0.7; transition: all 0.2s ease; }
+.sixteenth-note-button.active { background-color: #28a745; }
+.sixteenth-note-button.active img { filter: none; opacity: 1; }
+.sixteenth-note-button.disabled { cursor: not-allowed; background-color: #f0f0f0; border-color: #ccc; }
+.sixteenth-note-button.disabled img { filter: grayscale(1); opacity: 0.5; }
 
 
 /* Audio checkboxes */
