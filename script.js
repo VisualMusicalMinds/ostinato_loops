@@ -126,7 +126,6 @@
   let editingIndex = { line: null, position: null };
   let beatBarIconActive = true;
   let sixteenthNoteModeActive = false;
-  let originalEighthNotePattern = [];
   let sixteenthNotePatternCache = [];
   let timeSignatureNumerator = 4;
   let timeSignatureDenominator = 4;
@@ -351,9 +350,27 @@
   function convertTo8thNotePattern(sixteenthNoteWords) {
     const eighthNoteWords = [];
     for (let i = 0; i < sixteenthNoteWords.length; i += 4) {
-      // For each beat (4 sixteenth notes), compress to 2 eighth notes
-      eighthNoteWords.push(sixteenthNoteWords[i] || '-');
-      eighthNoteWords.push(sixteenthNoteWords[i+2] || '-');
+      // First 8th note is active if the 1st or 2nd 16th is active
+      const first16th = sixteenthNoteWords[i];
+      const second16th = sixteenthNoteWords[i+1];
+      if (first16th && first16th !== '-') {
+          eighthNoteWords.push(first16th);
+      } else if (second16th && second16th !== '-') {
+          eighthNoteWords.push(second16th);
+      } else {
+          eighthNoteWords.push('-');
+      }
+
+      // Second 8th note is active if the 3rd or 4th 16th is active
+      const third16th = sixteenthNoteWords[i+2];
+      const fourth16th = sixteenthNoteWords[i+3];
+      if (third16th && third16th !== '-') {
+        eighthNoteWords.push(third16th);
+      } else if (fourth16th && fourth16th !== '-') {
+        eighthNoteWords.push(fourth16th);
+      } else {
+        eighthNoteWords.push('-');
+      }
     }
     return eighthNoteWords;
   }
@@ -610,10 +627,36 @@
               // Switching from 8th to 16th mode
               sixteenthNoteModeActive = true;
               if (sixteenthNotePatternCache.length > 0) {
-                  // If a cached 16th pattern exists, restore it
-                  words = sixteenthNotePatternCache.map(line => line.slice());
+                  const currentEighths = words;
+                  const simplifiedCachedEighths = sixteenthNotePatternCache.map(line => convertTo8thNotePattern(line));
+                  const finalSixteenths = [];
+
+                  for (let i = 0; i < currentEighths.length; i++) {
+                      const currentEighthLine = currentEighths[i];
+                      const simplifiedCachedEighthLine = simplifiedCachedEighths[i];
+                      const cachedSixteenthLine = sixteenthNotePatternCache[i];
+                      const mergedSixteenthLine = [];
+
+                      for (let j = 0; j < currentEighthLine.length; j += 2) {
+                          const beatIsUnchanged = currentEighthLine[j] === simplifiedCachedEighthLine[j] && 
+                                                  currentEighthLine[j+1] === simplifiedCachedEighthLine[j+1];
+                          
+                          const sixteenthBeatIndex = (j/2) * 4;
+
+                          if (beatIsUnchanged) {
+                              mergedSixteenthLine.push(cachedSixteenthLine[sixteenthBeatIndex]);
+                              mergedSixteenthLine.push(cachedSixteenthLine[sixteenthBeatIndex + 1]);
+                              mergedSixteenthLine.push(cachedSixteenthLine[sixteenthBeatIndex + 2]);
+                              mergedSixteenthLine.push(cachedSixteenthLine[sixteenthBeatIndex + 3]);
+                          } else {
+                              const newSixteenthBeat = convertTo16thNotePattern([currentEighthLine[j], currentEighthLine[j+1]]);
+                              mergedSixteenthLine.push(...newSixteenthBeat);
+                          }
+                      }
+                      finalSixteenths.push(mergedSixteenthLine);
+                  }
+                  words = finalSixteenths;
               } else {
-                  // Otherwise, create a new 16th pattern from the current 8ths
                   words = words.map(line => convertTo16thNotePattern(line));
               }
           }
@@ -698,8 +741,12 @@
       // If time signature is not 4/4 and we are in 16th note mode, revert.
       if (timeSignatureDenominator !== 4 && sixteenthNoteModeActive) {
           sixteenthNoteModeActive = false;
-          words = originalEighthNotePattern.slice();
-          originalEighthNotePattern = [];
+          // When the time signature becomes incompatible, we should clear the 16th note cache.
+          // This prevents unexpected rhythm restorations if the user switches back to 4/4 later.
+          sixteenthNotePatternCache = []; 
+          // We also need to decide what to do with the `words` array.
+          // Reverting to a simple 8th note pattern is a safe default.
+          words = words.map(line => convertTo8thNotePattern(line));
       }
 
       // Disable button for any non-4/4 time signature
