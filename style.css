@@ -1,6 +1,51 @@
 body { margin: 0; padding: 0; }
 #poem { font-size: 1.2em; line-height: 1.5em; padding: 10px; }
-.line { display: block; margin-bottom: 8px; text-align: center; }
+.line {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Vertically center items in the line */
+  margin-bottom: 8px;
+  justify-content: center; /* Horizontally center the content */
+}
+
+.sound-selector {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  min-width: 108px; /* Give it a fixed width */
+  justify-content: space-between;
+}
+
+.selector-button {
+  background-color: #f0f8ff;
+  border: 1px solid #007bff;
+  border-radius: 50%; /* Make it circular */
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #007bff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selector-button:hover {
+  background-color: #e6f3ff;
+}
+
+.sound-image {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.sound-image.muted {
+  filter: grayscale(100%);
+}
+
 .measure { display: inline-block; vertical-align: top; }
 .measure-divider { display: inline-block; width: 2px; background-color: #666; margin: 0 8px; vertical-align: top; position: relative; }
 .final-measure-divider { display: inline-block; width: 6px; background: linear-gradient(to right, #666 0%, #666 25%, transparent 25%, transparent 75%, #666 75%, #666 100%); margin: 0 8px; vertical-align: top; position: relative; }
