@@ -125,6 +125,9 @@
   let syncopationStates = [{}, {}, {}, {}];
   let editingIndex = { line: null, position: null };
   let beatBarIconActive = true;
+  let sixteenthNoteModeActive = false;
+  let originalEighthNotePattern = [];
+  let sixteenthNotePatternCache = [];
   let timeSignatureNumerator = 4;
   let timeSignatureDenominator = 4;
   let hasPickupMeasure = false;
@@ -486,8 +489,10 @@
 
   // Get layout configuration based on time signature and screen width
   function getLayoutConfig() {
-    // Simplified for the new 4-line, 4-beat structure.
-    const circlesPerBeat = 2; // 8th notes
+    let circlesPerBeat = timeSignatureDenominator === 8 ? 3 : 2;
+    if (timeSignatureDenominator === 4 && sixteenthNoteModeActive) {
+        circlesPerBeat = 4;
+    }
     const beatsPerMeasure = 4;
     const measuresPerLine = 1;
     const circlesPerMeasure = beatsPerMeasure * circlesPerBeat;
@@ -590,6 +595,33 @@
   const copyVisualBtn = document.getElementById('copy-visual-btn');
   copyVisualBtn.addEventListener('click', captureVisual);
 
+  // 16th note button
+  const sixteenthNoteBtn = document.getElementById('sixteenth-note-btn');
+  sixteenthNoteBtn.addEventListener('click', () => {
+      if (timeSignatureDenominator === 4) {
+          if (sixteenthNoteModeActive) {
+              // Switching from 16th to 8th mode
+              sixteenthNoteModeActive = false;
+              // Cache the complex 16th note pattern
+              sixteenthNotePatternCache = words.map(line => line.slice());
+              // Convert to a simplified 8th note view for display
+              words = words.map(line => convertTo8thNotePattern(line));
+          } else {
+              // Switching from 8th to 16th mode
+              sixteenthNoteModeActive = true;
+              if (sixteenthNotePatternCache.length > 0) {
+                  // If a cached 16th pattern exists, restore it
+                  words = sixteenthNotePatternCache.map(line => line.slice());
+              } else {
+                  // Otherwise, create a new 16th pattern from the current 8ths
+                  words = words.map(line => convertTo16thNotePattern(line));
+              }
+          }
+          sixteenthNoteBtn.classList.toggle('active', sixteenthNoteModeActive);
+          render();
+      }
+  });
+
 
   // --- PLAYBACK LOGIC ---
 
@@ -660,6 +692,27 @@
 
   // --- RENDERING LOGIC ---
 
+  function updateSixteenthNoteButtonState() {
+      const sixteenthNoteBtn = document.getElementById('sixteenth-note-btn');
+      
+      // If time signature is not 4/4 and we are in 16th note mode, revert.
+      if (timeSignatureDenominator !== 4 && sixteenthNoteModeActive) {
+          sixteenthNoteModeActive = false;
+          words = originalEighthNotePattern.slice();
+          originalEighthNotePattern = [];
+      }
+
+      // Disable button for any non-4/4 time signature
+      if (timeSignatureDenominator !== 4) {
+          sixteenthNoteBtn.classList.add('disabled');
+      } else {
+          sixteenthNoteBtn.classList.remove('disabled');
+      }
+
+      // Finally, ensure the active class is correct
+      sixteenthNoteBtn.classList.toggle('active', sixteenthNoteModeActive);
+  }
+
   function dismantleSyncopation(syncStartIndex) {
       const syncTriggerPos = syncStartIndex + 1;
       const syncopationIndex = syncopation.indexOf(syncTriggerPos);
@@ -699,37 +752,40 @@
   function getChantText(activeStates) {
     const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
     switch (pattern) {
-      // Two-circle
-      case 'B/G': return ['Ta', '-'];
-      case 'B/B': return ['Ti', 'ti'];
-      case 'G/B': return ['-', 'ti'];
-      case 'G/G': return ['-', '-'];
-      // Three-circle
-      case 'B/G/G': return ['Ta', '-', '-'];
-      case 'B/B/G': return ['Ti', 'Ta', '-'];
-      case 'B/B/B': return ['Ti', 'ti', 'ti'];
-      case 'G/B/G': return ['-', 'Ta', '-'];
-      case 'G/B/B': return ['-', 'ti', 'ti'];
-      case 'G/G/B': return ['-', '-', 'ti'];
-      case 'B/G/B': return ['Ta', '-', 'ti'];
-      case 'G/G/G': return ['-', '-', '-'];
-      // Four-circle
-      case 'B/G/G/G': return ['Ta', '-', '-', '-'];
-      case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];
-      case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];
-      case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];
-      case 'B/G/B/B': return ['Ti', '-', 'ti', 'ki'];
-      case 'G/B/B/B': return ['-', 'ki', 'ti', 'ki'];
-      case 'G/B/G/G': return ['-', 'ki', '-', '-'];
-      case 'G/G/B/G': return ['-', '-', 'ti', '-'];
-      case 'G/G/G/B': return ['-', '-', '-', 'ki'];
-      case 'B/B/G/G': return ['Ti', 'ki', '-', '-'];
-      case 'G/B/G/B': return ['-', 'ki', '-', 'ki'];
-      case 'G/B/B/G': return ['-', 'ki', 'ti', '-'];
-      case 'B/B/G/B': return ['Ti', 'ki', '-', 'ti'];
-      case 'G/G/B/B': return ['-', '-', 'ti', 'ki'];
-      case 'G/G/G/G': return ['-', '-', '-', '-'];
-      case 'B/G/G/B': return ['Ti', '-', '-', 'ki'];
+      // Two-circle patterns (8th note mode)
+      case 'B/G': return ['Ta', '-'];        // Quarter note
+      case 'B/B': return ['Ti', 'ti'];       // Two eighth notes
+      case 'G/B': return ['-', 'ti'];        // Eighth rest + eighth note
+      case 'G/G': return ['-', '-'];         // Quarter rest
+      
+      // Three-circle patterns (compound time - 6/8, 9/8, 12/8)
+      case 'B/G/G': return ['Ta', '-', '-'];       // Dotted quarter note
+      case 'B/B/G': return ['Ti', 'Ta', '-'];      // Eighth + quarter
+      case 'B/B/B': return ['Ti', 'ti', 'ti'];     // Three eighth notes
+      case 'G/B/G': return ['-', 'Ta', '-'];       // Rest + quarter + rest
+      case 'G/B/B': return ['-', 'ti', 'ti'];      // Rest + two eighths
+      case 'G/G/B': return ['-', '-', 'ti'];       // Two rests + eighth
+      case 'B/G/B': return ['Ta', '-', 'ti'];      // Quarter + rest + eighth
+      case 'G/G/G': return ['-', '-', '-'];        // Three rests
+      
+      // Four-circle patterns (16th note mode)
+      case 'B/G/G/G': return ['Ta', '-', '-', '-'];     // Quarter note
+      case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];    // Two eighth notes
+      case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];  // Four sixteenth notes
+      case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];   // Three sixteenths + rest
+      case 'B/G/B/B': return ['Ti', '-', 'ti', 'ki'];   // Eighth + two sixteenths
+      case 'G/B/B/B': return ['-', 'ki', 'ti', 'ki'];   // Rest + three sixteenths
+      case 'G/B/G/G': return ['-', 'ki', '-', '-'];     // Rest + sixteenth + rests
+      case 'G/G/B/G': return ['-', '-', 'ti', '-'];     // Rests + eighth + rest
+      case 'G/G/G/B': return ['-', '-', '-', 'ki'];     // Three rests + sixteenth
+      case 'B/B/G/G': return ['Ti', 'ki', '-', '-'];    // Two sixteenths + rests
+      case 'G/B/G/B': return ['-', 'ki', '-', 'ki'];    // Rest + sixteenth + rest + sixteenth
+      case 'G/B/B/G': return ['-', 'ki', 'ti', '-'];    // Rest + two sixteenths + rest
+      case 'B/B/G/B': return ['Ti', 'ki', '-', 'ti'];   // Two sixteenths + rest + eighth
+      case 'G/G/B/B': return ['-', '-', 'ti', 'ki'];    // Rests + eighth + sixteenth
+      case 'G/G/G/G': return ['-', '-', '-', '-'];      // Four rests
+      case 'B/G/G/B': return ['Ti', '-', '-', 'ki'];    // Eighth + rests + sixteenth
+      
       default: return [];
     }
   }
@@ -764,6 +820,10 @@
     const group = document.createElement('div');
     group.className = 'group';
 
+    if (config.circlesPerBeat === 4) {
+      group.classList.add('sixteenth');
+    }
+
     const beatBarDiv = document.createElement('div');
     beatBarDiv.className = 'beat-bar';
     if (!beatBarIconActive) beatBarDiv.classList.add('hidden');
@@ -773,6 +833,9 @@
         const idx = beatStartPosition + circleIndex;
         const half = document.createElement('div');
         half.className = 'beat-bar-half';
+        if (config.circlesPerBeat === 4) {
+            half.style.width = '25%';
+        }
         
         const isActive = isPositionActive(lineIndex, idx, displayWords);
         activeStates.push(isActive);
@@ -795,56 +858,57 @@
 
     const notesBox = document.createElement('div');
     notesBox.className = 'notes-box';
-    
-    const i = beatStartPosition;
-    const active1 = isPositionActive(lineIndex, i, displayWords);
-    const active2 = isPositionActive(lineIndex, i + 1, displayWords);
-    const isSyncopated = syncopation[lineIndex].includes(i + 1);
-    const syncopationType = getSyncopationType(lineIndex, i);
 
-    if (syncopationType === 'SyncopateB') notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-SyncopateB.svg'));
-    else if (syncopationType === 'SyncopateC') notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-SyncopateC.svg'));
-    else if (isSyncopated) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-SyncopateA.svg'));
-    else if (active1 && !active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-quarternote.svg'));
-    else if (active1 && active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-eighthnotepair.svg'));
-    else if (!active1 && !active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-quarterrest.svg'));
-    else if (!active1 && active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-eighthrestnote.svg'));
+    if (config.circlesPerBeat === 4) {
+        notesBox.classList.add('sixteenth');
+        const i = beatStartPosition;
+        const active1 = isPositionActive(lineIndex, i, displayWords);
+        const active2 = isPositionActive(lineIndex, i + 1, displayWords);
+        const active3 = isPositionActive(lineIndex, i + 2, displayWords);
+        const active4 = isPositionActive(lineIndex, i + 3, displayWords);
+        const pattern = (active1 ? 'X' : 'O') + (active2 ? 'X' : 'O') + (active3 ? 'X' : 'O') + (active4 ? 'X' : 'O');
+        const imageUrl = `https://visualmusicalminds.github.io/images/Wordrhythms-${pattern}.svg`;
+        notesBox.appendChild(createImage(imageUrl));
+    } else {
+        const i = beatStartPosition;
+        const active1 = isPositionActive(lineIndex, i, displayWords);
+        const active2 = isPositionActive(lineIndex, i + 1, displayWords);
+        const isSyncopated = syncopation[lineIndex].includes(i + 1);
+        const syncopationType = getSyncopationType(lineIndex, i);
+
+        if (syncopationType === 'SyncopateB') notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-SyncopateB.svg'));
+        else if (syncopationType === 'SyncopateC') notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-SyncopateC.svg'));
+        else if (isSyncopated) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-SyncopateA.svg'));
+        else if (active1 && !active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-quarternote.svg'));
+        else if (active1 && active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-eighthnotepair.svg'));
+        else if (!active1 && !active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-quarterrest.svg'));
+        else if (!active1 && active2) notesBox.appendChild(createImage('https://visualmusicalminds.github.io/images/Wordrhythms-eighthrestnote.svg'));
+    }
 
     group.appendChild(notesBox);
 
     const wordsDiv = document.createElement('div');
     wordsDiv.className = 'words';
 
-    // Determine the pattern from the two active states for this beat.
-    const pattern = (activeStates[0] ? 'O' : 'G') + (activeStates[1] ? 'O' : 'G');
+    // Get the chant text based on the active states for the beat
+    const chantTexts = getChantText(activeStates);
 
-    let textContent = '';
-    let isRest = false;
+    // Create a word container and word span for each text item
+    chantTexts.forEach(text => {
+        const wordContainer = document.createElement('div');
+        wordContainer.className = 'word-container';
 
-    switch (pattern) {
-        case 'OG': // Ta
-            textContent = 'Ta';
-            break;
-        case 'OO': // Ti - Ti
-            textContent = 'Ti - Ti';
-            break;
-        case 'GO': // - ti
-            textContent = '- ti';
-            break;
-        case 'GG': // -
-            textContent = '-';
-            isRest = true;
-            break;
-    }
+        const span = document.createElement('span');
+        span.className = 'word';
+        if (text === '-') {
+            span.classList.add('rest');
+        }
+        span.textContent = text;
 
-    const span = document.createElement('span');
-    span.className = 'word';
-    span.textContent = textContent;
-    if (isRest) {
-        span.classList.add('rest');
-    }
+        wordContainer.appendChild(span);
+        wordsDiv.appendChild(wordContainer);
+    });
 
-    wordsDiv.appendChild(span);
     group.appendChild(wordsDiv);
     return group;
   }
@@ -897,6 +961,7 @@
 
   function render() {
     // This function is overhauled for the new 4-line structure.
+    updateSixteenthNoteButtonState();
 
     container.innerHTML = '';
     notesBoxElements = [[], [], [], []]; // 2D array for 4 lines
