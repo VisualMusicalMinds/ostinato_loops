@@ -58,7 +58,7 @@ body { margin: 0; padding: 0; }
 .beat-bar {
   display: flex;
   height: 8px;
-  width: 40px;
+  width: 46px;
   background-color: #e0e0e0;
   border: 1px solid #c0c0c0;
   border-radius: 4px;
@@ -72,7 +72,10 @@ body { margin: 0; padding: 0; }
   pointer-events: none;
 }
 .group.sixteenth .beat-bar {
-    width: 80px;
+    width: 101px;
+}
+.group.sixteenth .words {
+    width: 101px;
 }
 .beat-bar-half {
   width: 50%;
@@ -82,7 +85,15 @@ body { margin: 0; padding: 0; }
 .beat-bar-half.active {
   background-color: #ff8c00; /* Vibrant Orange */
 }
-.words { display: flex; justify-content: center; }
+.words { 
+  display: flex; 
+  justify-content: space-around; 
+  width: 46px; 
+  margin: 0 auto; 
+}
+.words.center-text {
+  justify-content: center;
+}
 .word-container { display: inline-block; margin: 0 4px; text-align: center; }
 .word, .word-input { display: block; cursor: pointer; }
 .word.rest { color: #d3d3d3; }
