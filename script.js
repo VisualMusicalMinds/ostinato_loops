@@ -1153,7 +1153,7 @@
       case 'G/G/G': return ['-', '-', '-'];        // Three rests
       
       // Four-circle patterns (16th note mode)
-      case 'B/G/G/G': return ['Ta', '-', '-', '-'];     // Quarter note
+      case 'B/G/G/G': return ['Ta'];     // Quarter note
       case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];    // Two eighth notes
       case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];  // Four sixteenth notes
       case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];   // Three sixteenths + rest
@@ -1273,6 +1273,11 @@
 
     const wordsDiv = document.createElement('div');
     wordsDiv.className = 'words';
+
+    const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
+    if (pattern === 'B/G/G/G') {
+        wordsDiv.classList.add('center-text');
+    }
 
     // Get the chant text based on the active states for the beat
     const chantTexts = getChantText(activeStates);
