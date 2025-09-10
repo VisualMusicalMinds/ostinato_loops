@@ -264,7 +264,7 @@
   function createHandClap() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
-      const decayTime = 1.5;
+      const decayTime = 2.0; // Increased decay time for a longer tail
 
       // We'll create multiple short bursts of noise
       const burstCount = 3 + Math.floor(Math.random() * 2); // 3 or 4 bursts
@@ -294,7 +294,8 @@
 
           envelope.gain.setValueAtTime(0, startTime);
           envelope.gain.linearRampToValueAtTime(randomGain, startTime + 0.02);
-          envelope.gain.exponentialRampToValueAtTime(0.01, startTime + decayTime);
+          // Switched to linear ramp for a more gradual decay
+          envelope.gain.linearRampToValueAtTime(0.01, startTime + decayTime);
 
           noise.connect(filter);
           filter.connect(envelope);
