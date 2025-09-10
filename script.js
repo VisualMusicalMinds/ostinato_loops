@@ -120,7 +120,7 @@
 
   const initialLine = () => Array(8).fill('-');
   let words = [initialLine(), initialLine(), initialLine(), initialLine()];
-  let lineSoundIndexes = [0, 1, 2, 3]; // Default sounds for each line
+  let lineSoundIndexes = [6, 4, 2, 0]; // Default sounds for each line
   let lineMutedState = [false, false, false, false]; // Mute state for each line
   
   let syncopation = [[], [], [], []];
