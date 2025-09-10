@@ -933,11 +933,32 @@
     if (isPlaying) stopPlayback(); else startPlayback();
   });
 
-  // Checkbox handlers
-  const beatCheckbox = document.getElementById('beat-checkbox');
-  const rhythmCheckbox = document.getElementById('rhythm-checkbox');
-  beatCheckbox.addEventListener('change', (e) => { beatEnabled = e.target.checked; });
-  rhythmCheckbox.addEventListener('change', (e) => { rhythmEnabled = e.target.checked; });
+
+  // Toggle button handlers
+  const beatButton = document.getElementById('beat-button');
+  const countButton = document.getElementById('count-button');
+  const rhythmButton = document.getElementById('rhythm-button');
+  const oneButton = document.getElementById('one-button');
+
+  beatButton.addEventListener('click', () => {
+    beatEnabled = !beatEnabled;
+    beatButton.classList.toggle('active');
+  });
+
+  rhythmButton.addEventListener('click', () => {
+    rhythmEnabled = !rhythmEnabled;
+    rhythmButton.classList.toggle('active');
+  });
+
+  countButton.addEventListener('click', () => {
+    countButton.classList.toggle('active');
+  });
+
+  oneButton.addEventListener('click', () => {
+    const currentNumber = parseInt(oneButton.textContent, 10);
+    const nextNumber = (currentNumber % 4) + 1;
+    oneButton.textContent = nextNumber;
+  });
 
   // Copy Visual button
   const copyVisualBtn = document.getElementById('copy-visual-btn');
