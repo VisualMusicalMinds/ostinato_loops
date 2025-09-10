@@ -1001,6 +1001,9 @@
 
   function startPlayback() {
     initAudioContext();
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
     isPlaying = true;
     playButton.textContent = '⏸';
     playButton.classList.add('playing');
@@ -1062,7 +1065,10 @@
     playTimeouts = [];
     
     clearHighlights();
-    // No need to re-render, clearHighlights is enough.
+
+    if (audioContext) {
+      audioContext.suspend();
+    }
   }
 
   function updateBeatBarVisibility() {
