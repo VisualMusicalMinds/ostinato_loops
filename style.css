@@ -324,44 +324,6 @@ body { margin: 0; padding: 36px 0 0 0;  }
 .sixteenth-note-button.disabled img { filter: grayscale(1); opacity: 0.5; }
 
 
-/* Audio checkboxes */
-.audio-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.checkbox-row input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  accent-color: #28a745; /* Green for beat */
-}
-
-.checkbox-row.rhythm input[type="checkbox"] {
-  accent-color: #007bff; /* Blue for rhythm */
-}
-
-.checkbox-row label {
-  color: #333;
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox-row.beat label {
-  color: #28a745;
-}
-
-.checkbox-row.rhythm label {
-  color: #007bff;
-}
 
 /* Modal Styles */
 .modal-backdrop {
@@ -573,6 +535,42 @@ body { margin: 0; padding: 36px 0 0 0;  }
   background-color: #e6f3ff;
 }
 
+/* Toggle Button Group */
+.toggle-button-group {
+  display: grid;
+  grid-template-columns: repeat(2, 60px);
+  grid-template-rows: repeat(2, 28px);
+  gap: 0;
+}
+
+.toggle-button {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-button.active {
+  color: white;
+}
+
+.toggle-button.beat-button.active,
+#count-button.active {
+  background-color: #007bff;
+  border-color: #0056b3;
+}
+
+.toggle-button.rhythm-button.active {
+  background-color: #28a745;
+  border-color: #1e7e34;
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 720px) {
   .floating-panel {
@@ -580,7 +578,7 @@ body { margin: 0; padding: 36px 0 0 0;  }
     display: grid;
     grid-template-areas:
       "play ts note para camera circle"
-      ". bpm audio-ctrl lyrics . .";
+      ". bpm toggle-group lyrics . .";
     grid-template-columns: 1fr repeat(4, auto) 1fr;
     grid-template-rows: auto auto;
     gap: 5px 10px; /* Reduced row gap */
@@ -609,7 +607,7 @@ body { margin: 0; padding: 36px 0 0 0;  }
   #copy-visual-btn { grid-area: camera; }
   #circle-icon { grid-area: circle; justify-self: start; }
   #bpm-button { grid-area: bpm; justify-self: end; }
-  .audio-controls { grid-area: audio-ctrl; }
+  .toggle-button-group { grid-area: toggle-group; }
   #lyrics-dropdown { grid-area: lyrics; justify-self: start;}
 
   /* Ensure all direct children of the panel are considered grid items */
