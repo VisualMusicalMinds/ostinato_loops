@@ -120,6 +120,7 @@
 
   const initialLine = () => Array(8).fill('-');
   let words = [initialLine(), initialLine(), initialLine(), initialLine()];
+  let visibleLines = 4; // Default to 4 lines visible
   let lineSoundIndexes = [6, 4, 2, 0]; // Default sounds for each line
   let lineMutedState = [false, false, false, false]; // Mute state for each line
   
@@ -954,10 +955,19 @@
     countButton.classList.toggle('active');
   });
 
+  function updateOneButtonAppearance() {
+    const number = visibleLines;
+    oneButton.classList.remove('color-1', 'color-2', 'color-3', 'color-4');
+    oneButton.classList.add(`color-${number}`);
+  }
+
   oneButton.addEventListener('click', () => {
     const currentNumber = parseInt(oneButton.textContent, 10);
     const nextNumber = (currentNumber % 4) + 1;
     oneButton.textContent = nextNumber;
+    visibleLines = nextNumber;
+    updateOneButtonAppearance();
+    render();
   });
 
   // Copy Visual button
@@ -1384,7 +1394,8 @@
     notesBoxElements = [[], [], [], []]; // 2D array for 4 lines
     const config = getLayoutConfig();
 
-    words.forEach((lineWords, lineIndex) => {
+    for (let lineIndex = 0; lineIndex < visibleLines; lineIndex++) {
+        const lineWords = words[lineIndex];
         const lineDiv = document.createElement('div');
         lineDiv.className = 'line';
 
@@ -1447,7 +1458,7 @@
         lineDiv.appendChild(measureDiv);
         lineDiv.appendChild(createDivider(true)); // Add a final bar line to each line
         container.appendChild(lineDiv);
-    });
+    }
   }
 
   // --- INITIALIZATION ---
@@ -1490,4 +1501,5 @@
   
   applyZoom();
   render();
+  updateOneButtonAppearance();
 })();
