@@ -1084,7 +1084,22 @@
       playTimeouts.push(setTimeout(scheduleLoop, totalDuration));
     };
 
-    scheduleLoop();
+    const isCountInEnabled = countButton.classList.contains('active');
+
+    if (isCountInEnabled) {
+      const countInBeats = 4;
+      for (let i = 0; i < countInBeats; i++) {
+        const timeDelay = i * beatInterval;
+        playTimeouts.push(setTimeout(() => {
+          if (isPlaying) {
+            playBrushDrum();
+          }
+        }, timeDelay));
+      }
+      playTimeouts.push(setTimeout(scheduleLoop, countInBeats * beatInterval));
+    } else {
+      scheduleLoop();
+    }
   }
 
   function stopPlayback() {
