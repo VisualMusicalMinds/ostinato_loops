@@ -3,7 +3,7 @@ body { margin: 0; padding: 26px 0 0 0;  }
 .line {
   display: flex; /* Use flexbox for alignment */
   align-items: center; /* Vertically center items in the line */
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   justify-content: center; /* Horizontally center the content */
 }
 
