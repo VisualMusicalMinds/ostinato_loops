@@ -571,6 +571,11 @@ body { margin: 0; padding: 36px 0 0 0;  }
   border-color: #1e7e34;
 }
 
+#one-button.color-1 { background-color: #ffc107; border-color: #d39e00; color: #212529; }
+#one-button.color-2 { background-color: #fd7e14; border-color: #c7610a; color: white; }
+#one-button.color-3 { background-color: #28a745; border-color: #1e7e34; color: white; }
+#one-button.color-4 { background-color: #dc3545; border-color: #b02a37; color: white; }
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 720px) {
   .floating-panel {
