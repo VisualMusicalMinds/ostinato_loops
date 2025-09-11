@@ -1,4 +1,4 @@
-body { margin: 0; padding: 36px 0 0 0;  }
+body { margin: 0; padding: 26px 0 0 0;  }
 #poem { font-size: 1.2em; line-height: 1.5em; padding: 10px; }
 .line {
   display: flex; /* Use flexbox for alignment */
@@ -57,7 +57,7 @@ body { margin: 0; padding: 36px 0 0 0;  }
 .notes-box.sixteenth svg, .notes-box.sixteenth img { width: 6em; }
 .beat-bar {
   display: flex;
-  height: 8px;
+  height: 10px;
   width: 46px;
   background-color: #e0e0e0;
   border: 1px solid #c0c0c0;
@@ -539,7 +539,7 @@ body { margin: 0; padding: 36px 0 0 0;  }
 .toggle-button-group {
   display: grid;
   grid-template-columns: repeat(2, 60px);
-  grid-template-rows: repeat(2, 28px);
+  grid-template-rows: repeat(2, 24px);
   gap: 0;
 }
 
