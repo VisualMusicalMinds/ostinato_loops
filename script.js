@@ -974,6 +974,25 @@
   const copyVisualBtn = document.getElementById('copy-visual-btn');
   copyVisualBtn.addEventListener('click', captureVisual);
 
+  // Save button and modal
+  const saveButton = document.getElementById('save-button');
+  const saveModal = document.getElementById('save-modal');
+  const cancelSaveButton = document.getElementById('cancel-save-button');
+  const submitSaveButton = document.getElementById('submit-save-button');
+
+  saveButton.addEventListener('click', () => {
+    saveModal.classList.add('visible');
+  });
+
+  cancelSaveButton.addEventListener('click', () => {
+    saveModal.classList.remove('visible');
+  });
+
+  submitSaveButton.addEventListener('click', () => {
+    // Later, this will handle saving the text.
+    saveModal.classList.remove('visible');
+  });
+
   // 16th note button
   const sixteenthNoteBtn = document.getElementById('sixteenth-note-btn');
   sixteenthNoteBtn.addEventListener('click', () => {
