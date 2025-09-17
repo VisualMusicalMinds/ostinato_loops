@@ -1033,7 +1033,70 @@
   });
 
   submitSaveButton.addEventListener('click', () => {
-    // Later, this will handle saving the text.
+    const multiLineInput = document.getElementById('multi-line-input');
+    const inputText = multiLineInput.value;
+    const lines = inputText.split('\n');
+
+    try {
+      // Parse BPM
+      const bpmMatch = lines[0].match(/\[BPM:(\d+)\]/);
+      if (bpmMatch && bpmMatch[1]) {
+        let newBPM = parseInt(bpmMatch[1], 10);
+        if (!isNaN(newBPM)) {
+          if (newBPM < 20) newBPM = 20;
+          if (newBPM > 600) newBPM = 600;
+          BPM = newBPM;
+          document.getElementById('bpm-value').textContent = BPM;
+        }
+      }
+
+      const lineRegex = /Line (\d+) \[([^\]]+)\]\s*(.*)/;
+      const rhythmRegex = /\[\d:([Yn]{4})\]/g;
+
+      for (let i = 1; i < lines.length; i++) {
+        const lineMatch = lines[i].match(lineRegex);
+        if (lineMatch) {
+          const lineIndex = parseInt(lineMatch[1], 10) - 1;
+          const instrumentName = lineMatch[2];
+          const rhythmData = lineMatch[3];
+
+          if (lineIndex >= 0 && lineIndex < 4) {
+            // Update instrument
+            const soundIndex = soundBank.findIndex(s => s.name === instrumentName);
+            if (soundIndex !== -1) {
+              lineSoundIndexes[lineIndex] = soundIndex;
+            }
+
+            // Update rhythm
+            let fullRhythmPattern = '';
+            let match;
+            while ((match = rhythmRegex.exec(rhythmData)) !== null) {
+              fullRhythmPattern += match[1];
+            }
+
+            if (fullRhythmPattern.length === 16) {
+              const newSixteenthPattern = fullRhythmPattern.split('').map(char => (char === 'Y' ? 'word' : '-'));
+              
+              if (sixteenthNoteModeActive) {
+                words[lineIndex] = newSixteenthPattern;
+              } else {
+                // Ensure cache is initialized for all lines if it's being used
+                if (sixteenthNotePatternCache.length === 0) {
+                    sixteenthNotePatternCache = words.map(lineToCache => convertTo16thNotePattern(lineToCache));
+                }
+                sixteenthNotePatternCache[lineIndex] = newSixteenthPattern;
+                words[lineIndex] = convertTo8thNotePattern(newSixteenthPattern);
+              }
+            }
+          }
+        }
+      }
+      render();
+    } catch (error) {
+      console.error("Error parsing input:", error);
+      // Optionally, show an error message to the user
+    }
+
     saveModal.classList.remove('visible');
   });
 
