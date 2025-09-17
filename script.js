@@ -984,17 +984,27 @@
     const multiLineInput = document.getElementById('multi-line-input');
     let outputText = `[BPM:${BPM}]\n`;
 
-    for (let i = 0; i < 4; i++) { // Always generate for all 4 lines
+    for (let i = 0; i < 4; i++) {
       const instrumentName = soundBank[lineSoundIndexes[i]].name;
-      let lineWords = words[i];
+      let lineWords;
 
-      // If not in 16th note mode, convert the 8th note pattern to a 16th note pattern for the output
-      if (!sixteenthNoteModeActive) {
-        lineWords = convertTo16thNotePattern(lineWords);
+      // Determine the correct source for the 16th note pattern
+      if (sixteenthNoteModeActive) {
+        // If in 16th note mode, the current 'words' array is the source of truth.
+        lineWords = words[i];
+      } else {
+        // If in 8th note mode, check the cache first.
+        if (sixteenthNotePatternCache.length > 0 && sixteenthNotePatternCache[i]) {
+          // The cache holds the true 16th note pattern.
+          lineWords = sixteenthNotePatternCache[i];
+        } else {
+          // If no cache, it means we started in 8th note mode. Convert the pattern.
+          lineWords = convertTo16thNotePattern(words[i]);
+        }
       }
 
       let rhythmText = '';
-      // Assuming 4 beats per measure as per getLayoutConfig
+      // Assuming 4 beats per measure, generate the rhythm string
       for (let beat = 0; beat < 4; beat++) {
         let beatPattern = '';
         for (let sixteenth = 0; sixteenth < 4; sixteenth++) {
@@ -1003,10 +1013,10 @@
             const word = lineWords[index];
             beatPattern += (word && word !== '-' && word !== '') ? 'Y' : 'n';
           } else {
-            beatPattern += 'n'; // Pad with rests if the line is short
+            beatPattern += 'n'; // Pad with rests if the line is unexpectedly short
           }
         }
-        rhythmText += `[${beatPattern}]`;
+        rhythmText += `[${beat + 1}:${beatPattern}]`;
         if (beat < 3) {
           rhythmText += ' ';
         }
