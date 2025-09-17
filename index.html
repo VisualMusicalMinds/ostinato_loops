@@ -25,6 +25,8 @@
 
     <div class="control-button copy-visual-button" id="copy-visual-btn">📷</div>
 
+    <div class="control-button" id="save-button">💾</div>
+
     <div class="control-button sixteenth-note-button" id="sixteenth-note-btn">
       <img src="https://visualmusicalminds.github.io/images/Wordrhythms-16thicon.svg" alt="16th note mode">
     </div>
@@ -43,5 +45,17 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="script.js"></script>
+
+  <!-- Save Modal -->
+  <div id="save-modal" class="modal-backdrop">
+    <div class="modal-content">
+      <h2>Save Work</h2>
+      <textarea id="multi-line-input" placeholder="Enter your text here..."></textarea>
+      <div class="modal-actions">
+        <button id="cancel-save-button" class="modal-button">Cancel</button>
+        <button id="submit-save-button" class="modal-button submit">Submit</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
