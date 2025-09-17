@@ -981,6 +981,40 @@
   const submitSaveButton = document.getElementById('submit-save-button');
 
   saveButton.addEventListener('click', () => {
+    const multiLineInput = document.getElementById('multi-line-input');
+    let outputText = `[BPM:${BPM}]\n`;
+
+    for (let i = 0; i < 4; i++) { // Always generate for all 4 lines
+      const instrumentName = soundBank[lineSoundIndexes[i]].name;
+      let lineWords = words[i];
+
+      // If not in 16th note mode, convert the 8th note pattern to a 16th note pattern for the output
+      if (!sixteenthNoteModeActive) {
+        lineWords = convertTo16thNotePattern(lineWords);
+      }
+
+      let rhythmText = '';
+      // Assuming 4 beats per measure as per getLayoutConfig
+      for (let beat = 0; beat < 4; beat++) {
+        let beatPattern = '';
+        for (let sixteenth = 0; sixteenth < 4; sixteenth++) {
+          const index = (beat * 4) + sixteenth;
+          if (index < lineWords.length) {
+            const word = lineWords[index];
+            beatPattern += (word && word !== '-' && word !== '') ? 'Y' : 'n';
+          } else {
+            beatPattern += 'n'; // Pad with rests if the line is short
+          }
+        }
+        rhythmText += `[${beatPattern}]`;
+        if (beat < 3) {
+          rhythmText += ' ';
+        }
+      }
+      outputText += `Line ${i + 1} [${instrumentName}] ${rhythmText}\n`;
+    }
+
+    multiLineInput.value = outputText.trim();
     saveModal.classList.add('visible');
   });
 
