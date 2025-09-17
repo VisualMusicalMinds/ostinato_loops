@@ -1323,12 +1323,12 @@
   function getFruitRhythmText(pattern) {
     const fruitRhythms = {
       // Two-circle patterns
-      'B/G': ['Pie', '-'],
+      'B/G': ['Pie'],
       'B/B': ['Ap', 'ple'],
       'G/B': ['-', 'Sweet'],
       'G/G': ['-', '-'],
       // Four-circle patterns
-      'B/G/G/G': ['Pie', '-', '-', '-'],
+      'B/G/G/G': ['Pie'],
       'B/G/B/G': ['Ap', '-', 'ple', '-'],
       'B/B/B/B': ['Wa', 'ter', 'me', 'lon'],
       'G/B/B/B': ['-', 'To', 'ma', 'to'],
@@ -1492,7 +1492,7 @@
     wordsDiv.className = 'words';
 
     const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
-    if (pattern === 'B/G/G/G') {
+    if (pattern === 'B/G/G/G' || pattern === 'B/G') {
         wordsDiv.classList.add('center-text');
     }
 
