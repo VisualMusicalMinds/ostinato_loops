@@ -144,6 +144,7 @@
   let BPM = 82;
   let textImportMode = 'replace'; // 'add' or 'replace'
   let savedTextInput = ''; // Store the text from the modal
+  let rhythmSystem = 'kodaly';
 
   // Audio context for generating sounds
   let audioContext = null;
@@ -1100,6 +1101,13 @@
     saveModal.classList.remove('visible');
   });
 
+  // Lyrics dropdown
+  const lyricsDropdown = document.getElementById('lyrics-dropdown');
+  lyricsDropdown.addEventListener('change', (e) => {
+      rhythmSystem = e.target.value;
+      render();
+  });
+
   // 16th note button
   const sixteenthNoteBtn = document.getElementById('sixteenth-note-btn');
   sixteenthNoteBtn.addEventListener('click', () => {
@@ -1312,8 +1320,38 @@
       }
   }
 
+  function getFruitRhythmText(pattern) {
+    const fruitRhythms = {
+      // Two-circle patterns
+      'B/G': ['Pie', '-'],
+      'B/B': ['Ap', 'ple'],
+      'G/B': ['-', 'Sweet'],
+      'G/G': ['-', '-'],
+      // Four-circle patterns
+      'B/G/G/G': ['Pie', '-', '-', '-'],
+      'B/G/B/G': ['Ap', '-', 'ple', '-'],
+      'B/B/B/B': ['Wa', 'ter', 'me', 'lon'],
+      'G/B/B/B': ['-', 'To', 'ma', 'to'],
+      'B/B/B/G': ['Co', 'co', 'nut', '-'],
+      'B/B/G/B': ['Ba', 'na', '-', 'na'],
+      'B/G/B/B': ['Blue', '-', 'ber', 'ry'],
+      'B/B/G/G': ['Ki', 'wi', '-', '-'],
+      'G/B/B/G': ['-', 'fi', 'let', '-'],
+      'G/G/B/B': ['-', '-', 'Ber', 'ry'],
+      'G/B/G/B': ['-', 'Sal', '-', 'sa'],
+      'B/G/G/B': ['Cher', '-', '-', 'ry'],
+      'G/B/G/G': ['-', 'Peas', '-', '-'],
+      'G/G/B/G': ['-', '-', 'Sweet', '-'],
+      'G/G/G/B': ['-', '-', '-', '&'],
+    };
+    return fruitRhythms[pattern] || [];
+  }
+
   function getChantText(activeStates) {
     const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
+    if (rhythmSystem === 'fruit-rhythms') {
+      return getFruitRhythmText(pattern);
+    }
     switch (pattern) {
       // Two-circle patterns (8th note mode)
       case 'B/G': return ['Ta', '-'];        // Quarter note
