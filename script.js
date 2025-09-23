@@ -1347,47 +1347,132 @@
     return fruitRhythms[pattern] || [];
   }
 
+  function getBeatCenteredKodalyText(pattern) {
+    const rhythms = {
+      'B/G': ['Ta'],
+      'B/B': ['Ta', 'Ti'],
+      'G/B': ['Ti'],
+      'G/G': [],
+      'B/G/G/G': ['Ta'],
+      'B/G/B/G': ['Ta', 'Ti'],
+      'B/B/B/B': ['Ta', 'Ka', 'Ti', 'Ka'],
+      'G/B/B/B': ['Ka', 'Ti', 'Ka'],
+      'B/B/B/G': ['Ta', 'Ka', 'Ta'],
+      'B/B/G/B': ['Ta', 'Ka', 'Ka'],
+      'B/G/B/B': ['Ta', 'Ti', 'Ka'],
+      'B/B/G/G': ['Ta', 'Ka'],
+      'G/B/B/G': ['Ka', 'Ti'],
+      'G/G/B/B': ['Ti', 'Ka'],
+      'G/B/G/B': ['Ka', 'Ka'],
+      'B/G/G/B': ['Ta', 'Ka'],
+      'G/B/G/G': ['Ka'],
+      'G/G/B/G': ['Ti'],
+      'G/G/G/B': ['Ka'],
+    };
+    return rhythms[pattern] || [];
+  }
+
+  function getGordonSystemText(pattern) {
+    const rhythms = {
+      'B/G': ['Du'],
+      'B/B': ['Du', 'De'],
+      'G/B': ['De'],
+      'G/G': [],
+      'B/G/G/G': ['Du'],
+      'B/G/B/G': ['Du', 'De'],
+      'B/B/B/B': ['Du', 'Ta', 'De', 'Ta'],
+      'G/B/B/B': ['Ta', 'De', 'Ta'],
+      'B/B/B/G': ['Du', 'Ta', 'De'],
+      'B/B/G/B': ['Du', 'Ta', 'Ta'],
+      'B/G/B/B': ['Du', 'De', 'Ta'],
+      'B/B/G/G': ['Du', 'Ta'],
+      'G/B/B/G': ['Ta', 'De'],
+      'G/G/B/B': ['De', 'Ta'],
+      'G/B/G/B': ['Ta', 'Ta'],
+      'B/G/G/B': ['Du', 'Ta'],
+      'G/B/G/G': ['Ta'],
+      'G/G/B/G': ['De'],
+      'G/G/G/B': ['Ta'],
+    };
+    return rhythms[pattern] || [];
+  }
+
+  function getTakadimiSystemText(pattern) {
+    const rhythms = {
+      'B/G': ['Ta'],
+      'B/B': ['Ta', 'Di'],
+      'G/B': ['Di'],
+      'G/G': [],
+      'B/G/G/G': ['Ta'],
+      'B/G/B/G': ['Ta', 'Di'],
+      'B/B/B/B': ['Ta', 'Ka', 'Di', 'Mi'],
+      'G/B/B/B': ['Ka', 'Di', 'Mi'],
+      'B/B/B/G': ['Ta', 'Ka', 'Di'],
+      'B/B/G/B': ['Ta', 'Ka', 'Mi'],
+      'B/G/B/B': ['Ta', 'Di', 'Mi'],
+      'B/B/G/G': ['Ta', 'Ka'],
+      'G/B/B/G': ['Ka', 'Di'],
+      'G/G/B/B': ['Di', 'Mi'],
+      'G/B/G/B': ['Ka', 'Mi'],
+      'B/G/G/B': ['Ta', 'Mi'],
+      'G/B/G/G': ['Ka'],
+      'G/G/B/G': ['Di'],
+      'G/G/G/B': ['Mi'],
+    };
+    return rhythms[pattern] || [];
+  }
+
   function getChantText(activeStates) {
     const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
-    if (rhythmSystem === 'fruit-rhythms') {
-      return getFruitRhythmText(pattern);
-    }
-    switch (pattern) {
-      // Two-circle patterns (8th note mode)
-      case 'B/G': return ['Ta', '-'];        // Quarter note
-      case 'B/B': return ['Ti', 'ti'];       // Two eighth notes
-      case 'G/B': return ['-', 'ti'];        // Eighth rest + eighth note
-      case 'G/G': return ['-', '-'];         // Quarter rest
-      
-      // Three-circle patterns (compound time - 6/8, 9/8, 12/8)
-      case 'B/G/G': return ['Ta', '-', '-'];       // Dotted quarter note
-      case 'B/B/G': return ['Ti', 'Ta', '-'];      // Eighth + quarter
-      case 'B/B/B': return ['Ti', 'ti', 'ti'];     // Three eighth notes
-      case 'G/B/G': return ['-', 'Ta', '-'];       // Rest + quarter + rest
-      case 'G/B/B': return ['-', 'ti', 'ti'];      // Rest + two eighths
-      case 'G/G/B': return ['-', '-', 'ti'];       // Two rests + eighth
-      case 'B/G/B': return ['Ta', '-', 'ti'];      // Quarter + rest + eighth
-      case 'G/G/G': return ['-', '-', '-'];        // Three rests
-      
-      // Four-circle patterns (16th note mode)
-      case 'B/G/G/G': return ['Ta'];     // Quarter note
-      case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];    // Two eighth notes
-      case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];  // Four sixteenth notes
-      case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];   // Three sixteenths + rest
-      case 'B/G/B/B': return ['Ti', '-', 'ti', 'ki'];   // Eighth + two sixteenths
-      case 'G/B/B/B': return ['-', 'ki', 'ti', 'ki'];   // Rest + three sixteenths
-      case 'G/B/G/G': return ['-', 'ki', '-', '-'];     // Rest + sixteenth + rests
-      case 'G/G/B/G': return ['-', '-', 'ti', '-'];     // Rests + eighth + rest
-      case 'G/G/G/B': return ['-', '-', '-', 'ki'];     // Three rests + sixteenth
-      case 'B/B/G/G': return ['Ti', 'ki', '-', '-'];    // Two sixteenths + rests
-      case 'G/B/G/B': return ['-', 'ki', '-', 'ki'];    // Rest + sixteenth + rest + sixteenth
-      case 'G/B/B/G': return ['-', 'ki', 'ti', '-'];    // Rest + two sixteenths + rest
-      case 'B/B/G/B': return ['Ti', 'ki', '-', 'ti'];   // Two sixteenths + rest + eighth
-      case 'G/G/B/B': return ['-', '-', 'ti', 'ki'];    // Rests + eighth + sixteenth
-      case 'G/G/G/G': return ['-', '-', '-', '-'];      // Four rests
-      case 'B/G/G/B': return ['Ti', '-', '-', 'ki'];    // Eighth + rests + sixteenth
-      
-      default: return [];
+    
+    switch (rhythmSystem) {
+      case 'fruit-rhythms':
+        return getFruitRhythmText(pattern);
+      case 'beat-centered-kodaly':
+        return getBeatCenteredKodalyText(pattern);
+      case 'gordon-system':
+        return getGordonSystemText(pattern);
+      case 'takadimi-system':
+        return getTakadimiSystemText(pattern);
+      case 'simple-kodaly':
+      default:
+        switch (pattern) {
+          // Two-circle patterns (8th note mode)
+          case 'B/G': return ['Ta', '-'];        // Quarter note
+          case 'B/B': return ['Ti', 'ti'];       // Two eighth notes
+          case 'G/B': return ['-', 'ti'];        // Eighth rest + eighth note
+          case 'G/G': return ['-', '-'];         // Quarter rest
+          
+          // Three-circle patterns (compound time - 6/8, 9/8, 12/8)
+          case 'B/G/G': return ['Ta', '-', '-'];       // Dotted quarter note
+          case 'B/B/G': return ['Ti', 'Ta', '-'];      // Eighth + quarter
+          case 'B/B/B': return ['Ti', 'ti', 'ti'];     // Three eighth notes
+          case 'G/B/G': return ['-', 'Ta', '-'];       // Rest + quarter + rest
+          case 'G/B/B': return ['-', 'ti', 'ti'];      // Rest + two eighths
+          case 'G/G/B': return ['-', '-', 'ti'];       // Two rests + eighth
+          case 'B/G/B': return ['Ta', '-', 'ti'];      // Quarter + rest + eighth
+          case 'G/G/G': return ['-', '-', '-'];        // Three rests
+          
+          // Four-circle patterns (16th note mode)
+          case 'B/G/G/G': return ['Ta'];     // Quarter note
+          case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];    // Two eighth notes
+          case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];  // Four sixteenth notes
+          case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];   // Three sixteenths + rest
+          case 'B/G/B/B': return ['Ti', '-', 'ti', 'ki'];   // Eighth + two sixteenths
+          case 'G/B/B/B': return ['-', 'ki', 'ti', 'ki'];   // Rest + three sixteenths
+          case 'G/B/G/G': return ['-', 'ki', '-', '-'];     // Rest + sixteenth + rests
+          case 'G/G/B/G': return ['-', '-', 'ti', '-'];     // Rests + eighth + rest
+          case 'G/G/G/B': return ['-', '-', '-', 'ki'];     // Three rests + sixteenth
+          case 'B/B/G/G': return ['Ti', 'ki', '-', '-'];    // Two sixteenths + rests
+          case 'G/B/G/B': return ['-', 'ki', '-', 'ki'];    // Rest + sixteenth + rest + sixteenth
+          case 'G/B/B/G': return ['-', 'ki', 'ti', '-'];    // Rest + two sixteenths + rest
+          case 'B/B/G/B': return ['Ti', 'ki', '-', 'ti'];   // Two sixteenths + rest + eighth
+          case 'G/G/B/B': return ['-', '-', 'ti', 'ki'];    // Rests + eighth + sixteenth
+          case 'G/G/G/G': return ['-', '-', '-', '-'];      // Four rests
+          case 'B/G/G/B': return ['Ti', '-', '-', 'ki'];    // Eighth + rests + sixteenth
+          
+          default: return [];
+        }
     }
   }
 
