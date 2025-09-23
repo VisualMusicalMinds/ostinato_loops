@@ -1323,12 +1323,12 @@
   function getFruitRhythmText(pattern) {
     const fruitRhythms = {
       // Two-circle patterns
-      'B/G': ['Pie', '-'],
+      'B/G': ['Pie'],
       'B/B': ['Ap', 'ple'],
       'G/B': ['-', 'Sweet'],
       'G/G': ['-', '-'],
       // Four-circle patterns
-      'B/G/G/G': ['Pie', '-', '-', '-'],
+      'B/G/G/G': ['Pie'],
       'B/G/B/G': ['Ap', '-', 'ple', '-'],
       'B/B/B/B': ['Wa', 'ter', 'me', 'lon'],
       'G/B/B/B': ['-', 'To', 'ma', 'to'],
@@ -1349,11 +1349,11 @@
 
   function getBeatCenteredKodalyText(pattern) {
     const rhythms = {
-      'B/G': ['Ta', '-'],
+      'B/G': ['Ta'],
       'B/B': ['Ta', 'Ti'],
       'G/B': ['-', 'Ti'],
       'G/G': ['-', '-'],
-      'B/G/G/G': ['Ta', '-', '-', '-'],
+      'B/G/G/G': ['Ta'],
       'B/G/B/G': ['Ta', '-', 'Ti', '-'],
       'B/B/B/B': ['Ta', 'Ka', 'Ti', 'Ka'],
       'G/B/B/B': ['-', 'Ka', 'Ti', 'Ka'],
@@ -1374,11 +1374,11 @@
 
   function getGordonSystemText(pattern) {
     const rhythms = {
-      'B/G': ['Du', '-'],
+      'B/G': ['Du'],
       'B/B': ['Du', 'De'],
       'G/B': ['-', 'De'],
       'G/G': ['-', '-'],
-      'B/G/G/G': ['Du', '-', '-', '-'],
+      'B/G/G/G': ['Du'],
       'B/G/B/G': ['Du', '-', 'De', '-'],
       'B/B/B/B': ['Du', 'Ta', 'De', 'Ta'],
       'G/B/B/B': ['-', 'Ta', 'De', 'Ta'],
@@ -1399,11 +1399,11 @@
 
   function getTakadimiSystemText(pattern) {
     const rhythms = {
-      'B/G': ['Ta', '-'],
+      'B/G': ['Ta'],
       'B/B': ['Ta', 'Di'],
       'G/B': ['-', 'Di'],
       'G/G': ['-', '-'],
-      'B/G/G/G': ['Ta', '-', '-', '-'],
+      'B/G/G/G': ['Ta'],
       'B/G/B/G': ['Ta', '-', 'Di', '-'],
       'B/B/B/B': ['Ta', 'Ka', 'Di', 'Mi'],
       'G/B/B/B': ['-', 'Ka', 'Di', 'Mi'],
@@ -1438,7 +1438,7 @@
       default:
         switch (pattern) {
           // Two-circle patterns (8th note mode)
-          case 'B/G': return ['Ta', '-'];        // Quarter note
+          case 'B/G': return ['Ta'];        // Quarter note
           case 'B/B': return ['Ti', 'ti'];       // Two eighth notes
           case 'G/B': return ['-', 'ti'];        // Eighth rest + eighth note
           case 'G/G': return ['-', '-'];         // Quarter rest
@@ -1454,7 +1454,7 @@
           case 'G/G/G': return ['-', '-', '-'];        // Three rests
           
           // Four-circle patterns (16th note mode)
-          case 'B/G/G/G': return ['Ta', '-', '-', '-'];     // Quarter note
+          case 'B/G/G/G': return ['Ta'];     // Quarter note
           case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];    // Two eighth notes
           case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];  // Four sixteenth notes
           case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];   // Three sixteenths + rest
@@ -1575,6 +1575,11 @@
 
     const wordsDiv = document.createElement('div');
     wordsDiv.className = 'words';
+
+    const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
+    if (pattern === 'B/G/G/G' || pattern === 'B/G') {
+        wordsDiv.classList.add('center-text');
+    }
 
     // Get the chant text based on the active states for the beat
     const chantTexts = getChantText(activeStates);
