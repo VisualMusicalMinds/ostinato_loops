@@ -1323,12 +1323,12 @@
   function getFruitRhythmText(pattern) {
     const fruitRhythms = {
       // Two-circle patterns
-      'B/G': ['Pie'],
+      'B/G': ['Pie', '-'],
       'B/B': ['Ap', 'ple'],
       'G/B': ['-', 'Sweet'],
       'G/G': ['-', '-'],
       // Four-circle patterns
-      'B/G/G/G': ['Pie'],
+      'B/G/G/G': ['Pie', '-', '-', '-'],
       'B/G/B/G': ['Ap', '-', 'ple', '-'],
       'B/B/B/B': ['Wa', 'ter', 'me', 'lon'],
       'G/B/B/B': ['-', 'To', 'ma', 'to'],
@@ -1349,75 +1349,75 @@
 
   function getBeatCenteredKodalyText(pattern) {
     const rhythms = {
-      'B/G': ['Ta'],
+      'B/G': ['Ta', '-'],
       'B/B': ['Ta', 'Ti'],
-      'G/B': ['Ti'],
-      'G/G': [],
-      'B/G/G/G': ['Ta'],
-      'B/G/B/G': ['Ta', 'Ti'],
+      'G/B': ['-', 'Ti'],
+      'G/G': ['-', '-'],
+      'B/G/G/G': ['Ta', '-', '-', '-'],
+      'B/G/B/G': ['Ta', '-', 'Ti', '-'],
       'B/B/B/B': ['Ta', 'Ka', 'Ti', 'Ka'],
-      'G/B/B/B': ['Ka', 'Ti', 'Ka'],
-      'B/B/B/G': ['Ta', 'Ka', 'Ta'],
-      'B/B/G/B': ['Ta', 'Ka', 'Ka'],
-      'B/G/B/B': ['Ta', 'Ti', 'Ka'],
-      'B/B/G/G': ['Ta', 'Ka'],
-      'G/B/B/G': ['Ka', 'Ti'],
-      'G/G/B/B': ['Ti', 'Ka'],
-      'G/B/G/B': ['Ka', 'Ka'],
-      'B/G/G/B': ['Ta', 'Ka'],
-      'G/B/G/G': ['Ka'],
-      'G/G/B/G': ['Ti'],
-      'G/G/G/B': ['Ka'],
+      'G/B/B/B': ['-', 'Ka', 'Ti', 'Ka'],
+      'B/B/B/G': ['Ta', 'Ka', 'Ta', '-'],
+      'B/B/G/B': ['Ta', 'Ka', '-', 'Ka'],
+      'B/G/B/B': ['Ta', '-', 'Ti', 'Ka'],
+      'B/B/G/G': ['Ta', 'Ka', '-', '-'],
+      'G/B/B/G': ['-', 'Ka', 'Ti', '-'],
+      'G/G/B/B': ['-', '-', 'Ti', 'Ka'],
+      'G/B/G/B': ['-', 'Ka', '-', 'Ka'],
+      'B/G/G/B': ['Ta', '-', '-', 'Ka'],
+      'G/B/G/G': ['-', 'Ka', '-', '-'],
+      'G/G/B/G': ['-', '-', 'Ti', '-'],
+      'G/G/G/B': ['-', '-', '-', 'Ka'],
     };
     return rhythms[pattern] || [];
   }
 
   function getGordonSystemText(pattern) {
     const rhythms = {
-      'B/G': ['Du'],
+      'B/G': ['Du', '-'],
       'B/B': ['Du', 'De'],
-      'G/B': ['De'],
-      'G/G': [],
-      'B/G/G/G': ['Du'],
-      'B/G/B/G': ['Du', 'De'],
+      'G/B': ['-', 'De'],
+      'G/G': ['-', '-'],
+      'B/G/G/G': ['Du', '-', '-', '-'],
+      'B/G/B/G': ['Du', '-', 'De', '-'],
       'B/B/B/B': ['Du', 'Ta', 'De', 'Ta'],
-      'G/B/B/B': ['Ta', 'De', 'Ta'],
-      'B/B/B/G': ['Du', 'Ta', 'De'],
-      'B/B/G/B': ['Du', 'Ta', 'Ta'],
-      'B/G/B/B': ['Du', 'De', 'Ta'],
-      'B/B/G/G': ['Du', 'Ta'],
-      'G/B/B/G': ['Ta', 'De'],
-      'G/G/B/B': ['De', 'Ta'],
-      'G/B/G/B': ['Ta', 'Ta'],
-      'B/G/G/B': ['Du', 'Ta'],
-      'G/B/G/G': ['Ta'],
-      'G/G/B/G': ['De'],
-      'G/G/G/B': ['Ta'],
+      'G/B/B/B': ['-', 'Ta', 'De', 'Ta'],
+      'B/B/B/G': ['Du', 'Ta', 'De', '-'],
+      'B/B/G/B': ['Du', 'Ta', '-', 'Ta'],
+      'B/G/B/B': ['Du', '-', 'De', 'Ta'],
+      'B/B/G/G': ['Du', 'Ta', '-', '-'],
+      'G/B/B/G': ['-', 'Ta', 'De', '-'],
+      'G/G/B/B': ['-', '-', 'De', 'Ta'],
+      'G/B/G/B': ['-', 'Ta', '-', 'Ta'],
+      'B/G/G/B': ['Du', '-', '-', 'Ta'],
+      'G/B/G/G': ['-', 'Ta', '-', '-'],
+      'G/G/B/G': ['-', '-', 'De', '-'],
+      'G/G/G/B': ['-', '-', '-', 'Ta'],
     };
     return rhythms[pattern] || [];
   }
 
   function getTakadimiSystemText(pattern) {
     const rhythms = {
-      'B/G': ['Ta'],
+      'B/G': ['Ta', '-'],
       'B/B': ['Ta', 'Di'],
-      'G/B': ['Di'],
-      'G/G': [],
-      'B/G/G/G': ['Ta'],
-      'B/G/B/G': ['Ta', 'Di'],
+      'G/B': ['-', 'Di'],
+      'G/G': ['-', '-'],
+      'B/G/G/G': ['Ta', '-', '-', '-'],
+      'B/G/B/G': ['Ta', '-', 'Di', '-'],
       'B/B/B/B': ['Ta', 'Ka', 'Di', 'Mi'],
-      'G/B/B/B': ['Ka', 'Di', 'Mi'],
-      'B/B/B/G': ['Ta', 'Ka', 'Di'],
-      'B/B/G/B': ['Ta', 'Ka', 'Mi'],
-      'B/G/B/B': ['Ta', 'Di', 'Mi'],
-      'B/B/G/G': ['Ta', 'Ka'],
-      'G/B/B/G': ['Ka', 'Di'],
-      'G/G/B/B': ['Di', 'Mi'],
-      'G/B/G/B': ['Ka', 'Mi'],
-      'B/G/G/B': ['Ta', 'Mi'],
-      'G/B/G/G': ['Ka'],
-      'G/G/B/G': ['Di'],
-      'G/G/G/B': ['Mi'],
+      'G/B/B/B': ['-', 'Ka', 'Di', 'Mi'],
+      'B/B/B/G': ['Ta', 'Ka', 'Di', '-'],
+      'B/B/G/B': ['Ta', 'Ka', '-', 'Mi'],
+      'B/G/B/B': ['Ta', '-', 'Di', 'Mi'],
+      'B/B/G/G': ['Ta', 'Ka', '-', '-'],
+      'G/B/B/G': ['-', 'Ka', 'Di', '-'],
+      'G/G/B/B': ['-', '-', 'Di', 'Mi'],
+      'G/B/G/B': ['-', 'Ka', '-', 'Mi'],
+      'B/G/G/B': ['Ta', '-', '-', 'Mi'],
+      'G/B/G/G': ['-', 'Ka', '-', '-'],
+      'G/G/B/G': ['-', '-', 'Di', '-'],
+      'G/G/G/B': ['-', '-', '-', 'Mi'],
     };
     return rhythms[pattern] || [];
   }
@@ -1454,7 +1454,7 @@
           case 'G/G/G': return ['-', '-', '-'];        // Three rests
           
           // Four-circle patterns (16th note mode)
-          case 'B/G/G/G': return ['Ta'];     // Quarter note
+          case 'B/G/G/G': return ['Ta', '-', '-', '-'];     // Quarter note
           case 'B/G/B/G': return ['Ti', '-', 'ti', '-'];    // Two eighth notes
           case 'B/B/B/B': return ['Ti', 'ki', 'ti', 'ki'];  // Four sixteenth notes
           case 'B/B/B/G': return ['Ti', 'ki', 'ti', '-'];   // Three sixteenths + rest
@@ -1575,11 +1575,6 @@
 
     const wordsDiv = document.createElement('div');
     wordsDiv.className = 'words';
-
-    const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
-    if (pattern === 'B/G/G/G' || pattern === 'B/G') {
-        wordsDiv.classList.add('center-text');
-    }
 
     // Get the chant text based on the active states for the beat
     const chantTexts = getChantText(activeStates);
