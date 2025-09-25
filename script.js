@@ -429,8 +429,8 @@ function createHandClap() {
     createFrequencyBand(2800, 1.5, 0.5, startTime + 0.004); // Adjusted frequency
     
     // High snap (finger/air interaction)
-    createFrequencyBand(6500, 2.5, 0.4, startTime + 0.001); // Adjusted frequency and Q
-    createFrequencyBand(8500, 2.0, 0.3, startTime + 0.003); // Adjusted frequency
+    createFrequencyBand(6500, 2.5, 0.46, startTime + 0.001); // Adjusted frequency and Q, boosted gain
+    createFrequencyBand(8500, 2.0, 0.345, startTime + 0.003); // Adjusted frequency, boosted gain
     
     // Add a subtle reverb tail with filtered noise
     const tailBufferSize = ctx.sampleRate * 0.3;
