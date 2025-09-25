@@ -276,6 +276,88 @@
       osc.stop(ctx.currentTime + 0.2);
   }
 
+  // Sound 5: Claves
+  function createClaves() {
+      const ctx = initAudioContext();
+      const analyser = setupAnalyser(ctx);
+      const baseFrequency = 2500;
+      const decayTime = 0.15;
+
+      // --- Original Oscillator ---
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = baseFrequency;
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + 0.001);
+      gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
+
+      const distortion = ctx.createWaveShaper();
+      function makeDistortionCurve(amount) {
+          const k = typeof amount === 'number' ? amount : 50;
+          const n_samples = 44100;
+          const curve = new Float32Array(n_samples);
+          for (let i = 0; i < n_samples; i++) {
+              const deg = Math.PI * i / n_samples;
+              curve[i] = ((3 + k) * deg) / (Math.PI + k * Math.abs(deg));
+          }
+          return curve;
+      }
+      distortion.curve = makeDistortionCurve(200);
+      distortion.oversample = '4x';
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = baseFrequency;
+      filter.Q.value = 8;
+      const filter2 = ctx.createBiquadFilter();
+      filter2.type = 'peaking';
+      filter2.frequency.value = 800;
+      filter2.gain.value = 3;
+      filter2.Q.value = 2;
+
+      // --- Reinforcement Oscillators ---
+      const freqs = [
+          baseFrequency / 2,            // Octave below
+          baseFrequency * 8 / 9,        // Major second below
+          (baseFrequency * 8 / 9) / 2   // Major second below, octave lower
+      ];
+
+      const reinforcementGains = [0.15, 0.1, 0.08]; // Quiet gain levels
+
+      freqs.forEach((freq, i) => {
+          const reinfOsc = ctx.createOscillator();
+          reinfOsc.type = 'sine';
+          reinfOsc.frequency.value = freq;
+          
+          const reinfGain = ctx.createGain();
+          reinfGain.gain.setValueAtTime(0, ctx.currentTime);
+          reinfGain.gain.linearRampToValueAtTime(reinforcementGains[i], ctx.currentTime + 0.001);
+          reinfGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
+
+          reinfOsc.connect(reinfGain);
+          reinfGain.connect(analyser);
+          reinfGain.connect(ctx.destination);
+          reinfOsc.start();
+          reinfOsc.stop(ctx.currentTime + decayTime);
+      });
+
+      // --- Master Gain and Connections ---
+      const masterGain = ctx.createGain();
+      masterGain.gain.value = 0.6;
+      
+      osc.connect(filter);
+      filter.connect(filter2);
+      filter2.connect(distortion);
+      distortion.connect(gain);
+      gain.connect(masterGain);
+      masterGain.connect(analyser);
+      masterGain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + decayTime);
+  }
+
   // Sound 4: Improved Hand Clap
 function createHandClap() {
     const ctx = initAudioContext();
@@ -359,52 +441,6 @@ function createHandClap() {
     tailNoise.start(startTime + 0.01);
     tailNoise.stop(startTime + 0.4);
 }
-  // Sound 4: Hand Clap
-  function createHandClap() {
-      const ctx = initAudioContext();
-      const analyser = setupAnalyser(ctx);
-      const decayTime = 0.4; // Reduced decay time for a tighter sound
-
-      // We'll create multiple short bursts of noise
-      const burstCount = 2 + Math.floor(Math.random() * 2); // 2 or 3 bursts
-
-      for (let i = 0; i < burstCount; i++) {
-          const bufferSize = ctx.sampleRate * 0.1; // Short burst
-          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-          const output = buffer.getChannelData(0);
-          for (let j = 0; j < bufferSize; j++) {
-              output[j] = Math.random() * 2 - 1;
-          }
-
-          const noise = ctx.createBufferSource();
-          noise.buffer = buffer;
-
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'bandpass';
-          // Randomize filter frequency slightly for each burst
-          filter.frequency.value = 1500 + (Math.random() - 0.5) * 500;
-          filter.Q.value = 1;
-
-          const envelope = ctx.createGain();
-          
-          // Each burst has its own envelope
-          const startTime = ctx.currentTime + i * (0.02 + Math.random() * 0.015);
-          const randomGain = 0.5 + Math.random() * 0.5;
-
-          envelope.gain.setValueAtTime(0, startTime);
-          envelope.gain.linearRampToValueAtTime(randomGain, startTime + 0.02);
-          // Switched to linear ramp for a more gradual decay
-          envelope.gain.linearRampToValueAtTime(0.01, startTime + decayTime);
-
-          noise.connect(filter);
-          filter.connect(envelope);
-          envelope.connect(analyser);
-          envelope.connect(ctx.destination);
-
-          noise.start(startTime);
-          noise.stop(startTime + decayTime);
-      }
-  }
 
   // Sound 6: Hi-Hat
   function createHiHat() {
