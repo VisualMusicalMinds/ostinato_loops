@@ -200,9 +200,15 @@
       }
       const noise = ctx.createBufferSource();
       noise.buffer = noiseBuffer;
+      
+      // Add a low-pass filter to soften the highs
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = 'lowpass';
+      noiseFilter.frequency.value = 6000; // Taper down frequencies above 6kHz
+
       const noiseGain = ctx.createGain();
       noiseGain.gain.setValueAtTime(0, ctx.currentTime);
-      noiseGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
+      noiseGain.gain.linearRampToValueAtTime(0.8, ctx.currentTime + 0.01); // Softer high sounds
       noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
       
       // Tonal component
@@ -220,10 +226,13 @@
       bassOsc.frequency.setValueAtTime(60, ctx.currentTime);
       const bassGain = ctx.createGain();
       bassGain.gain.setValueAtTime(0, ctx.currentTime);
-      bassGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.01);
+      bassGain.gain.linearRampToValueAtTime(0.8, ctx.currentTime + 0.01); // More bass
       bassGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + decayTime);
       
-      noise.connect(noiseGain);
+      // Connect noise through the filter
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      
       osc.connect(oscGain);
       bassOsc.connect(bassGain);
 
