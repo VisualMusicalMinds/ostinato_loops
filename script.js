@@ -358,15 +358,28 @@
       osc.stop(ctx.currentTime + decayTime);
   }
 
-  // Sound 4: Improved Hand Clap
+// Sound 4: Improved Hand Clap
 function createHandClap() {
     const ctx = initAudioContext();
     const analyser = setupAnalyser(ctx);
     
     const masterGain = ctx.createGain();
-    masterGain.gain.value = 7.8; // 20% louder
+    masterGain.gain.value = 1.2; // Adjusted master gain
     masterGain.connect(analyser);
     masterGain.connect(ctx.destination);
+
+    // Low-frequency oscillator for the "thump"
+    const thumpOsc = ctx.createOscillator();
+    thumpOsc.type = 'sine';
+    thumpOsc.frequency.setValueAtTime(100, ctx.currentTime); // Deep bass frequency
+    const thumpGain = ctx.createGain();
+    thumpGain.gain.setValueAtTime(0, ctx.currentTime);
+    thumpGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.01);
+    thumpGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    thumpOsc.connect(thumpGain);
+    thumpGain.connect(masterGain);
+    thumpOsc.start(ctx.currentTime);
+    thumpOsc.stop(ctx.currentTime + 0.1);
 
     // Create multiple frequency bands to simulate real clap characteristics
     const createFrequencyBand = (frequency, qValue, gain, startTime) => {
@@ -405,16 +418,19 @@ function createHandClap() {
     const startTime = ctx.currentTime;
     
     // Layer multiple frequency bands for realistic clap
-    // Low thump (palm contact)
-    createFrequencyBand(150, 0.8, 0.3, startTime);
+    // Low thump (palm contact) - now handled by thumpOsc, but we can keep a bit of noise
+    createFrequencyBand(200, 1.0, 0.4, startTime); // Adjusted frequency and Q
+    
+    // Mid-range body
+    createFrequencyBand(800, 1.2, 0.5, startTime + 0.003); // New mid-range band
     
     // Mid crack (main clap sound)
-    createFrequencyBand(2000, 2.0, 0.6, startTime + 0.002);
-    createFrequencyBand(2500, 1.5, 0.4, startTime + 0.004);
+    createFrequencyBand(2200, 1.8, 0.7, startTime + 0.002); // Adjusted frequency
+    createFrequencyBand(2800, 1.5, 0.5, startTime + 0.004); // Adjusted frequency
     
     // High snap (finger/air interaction)
-    createFrequencyBand(6000, 3.0, 0.3, startTime + 0.001);
-    createFrequencyBand(8000, 2.0, 0.2, startTime + 0.003);
+    createFrequencyBand(6500, 2.5, 0.4, startTime + 0.001); // Adjusted frequency and Q
+    createFrequencyBand(8500, 2.0, 0.3, startTime + 0.003); // Adjusted frequency
     
     // Add a subtle reverb tail with filtered noise
     const tailBufferSize = ctx.sampleRate * 0.3;
