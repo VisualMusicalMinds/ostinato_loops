@@ -275,10 +275,10 @@
   function createHandClap() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
-      const decayTime = 2.0; // Increased decay time for a longer tail
+      const decayTime = 0.4; // Reduced decay time for a tighter sound
 
       // We'll create multiple short bursts of noise
-      const burstCount = 3 + Math.floor(Math.random() * 2); // 3 or 4 bursts
+      const burstCount = 2 + Math.floor(Math.random() * 2); // 2 or 3 bursts
 
       for (let i = 0; i < burstCount; i++) {
           const bufferSize = ctx.sampleRate * 0.1; // Short burst
