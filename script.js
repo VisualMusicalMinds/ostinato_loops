@@ -364,7 +364,7 @@ function createHandClap() {
     const analyser = setupAnalyser(ctx);
     
     const masterGain = ctx.createGain();
-    masterGain.gain.value = 1.2; // 20% louder
+    masterGain.gain.value = 1.8; // 20% louder
     masterGain.connect(analyser);
     masterGain.connect(ctx.destination);
 
