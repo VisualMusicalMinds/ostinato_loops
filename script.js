@@ -238,7 +238,7 @@
 
       // Master gain to control overall volume
       const masterGain = ctx.createGain();
-      masterGain.gain.value = 0.9; // 10% quieter
+      masterGain.gain.value = 0.95; // 5% quieter
 
       // Connect components to master gain
       noiseGain.connect(masterGain);
@@ -363,6 +363,11 @@ function createHandClap() {
     const ctx = initAudioContext();
     const analyser = setupAnalyser(ctx);
     
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = 1.2; // 20% louder
+    masterGain.connect(analyser);
+    masterGain.connect(ctx.destination);
+
     // Create multiple frequency bands to simulate real clap characteristics
     const createFrequencyBand = (frequency, qValue, gain, startTime) => {
         // Shorter, more focused noise burst
@@ -391,8 +396,7 @@ function createHandClap() {
 
         noise.connect(filter);
         filter.connect(envelope);
-        envelope.connect(analyser);
-        envelope.connect(ctx.destination);
+        envelope.connect(masterGain);
 
         noise.start(startTime);
         noise.stop(startTime + 0.15);
@@ -435,8 +439,7 @@ function createHandClap() {
     
     tailNoise.connect(tailFilter);
     tailFilter.connect(tailEnvelope);
-    tailEnvelope.connect(analyser);
-    tailEnvelope.connect(ctx.destination);
+    tailEnvelope.connect(masterGain);
     
     tailNoise.start(startTime + 0.01);
     tailNoise.stop(startTime + 0.4);
