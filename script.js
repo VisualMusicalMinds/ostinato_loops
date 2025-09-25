@@ -236,13 +236,18 @@
       osc.connect(oscGain);
       bassOsc.connect(bassGain);
 
-      noiseGain.connect(analyser);
-      oscGain.connect(analyser);
-      bassGain.connect(analyser);
+      // Master gain to control overall volume
+      const masterGain = ctx.createGain();
+      masterGain.gain.value = 0.9; // 10% quieter
 
-      noiseGain.connect(ctx.destination);
-      oscGain.connect(ctx.destination);
-      bassGain.connect(ctx.destination);
+      // Connect components to master gain
+      noiseGain.connect(masterGain);
+      oscGain.connect(masterGain);
+      bassGain.connect(masterGain);
+
+      // Connect master gain to output
+      masterGain.connect(analyser);
+      masterGain.connect(ctx.destination);
 
       noise.start();
       osc.start();
@@ -275,7 +280,8 @@
   function createHandClap() {
       const ctx = initAudioContext();
       const analyser = setupAnalyser(ctx);
-     const decayTime = 2.0; // Increased decay time for a longer tail
+      const decayTime = 0.4; // Reduced decay time for a tighter sound
+
       // We'll create multiple short bursts of noise
       const burstCount = 2 + Math.floor(Math.random() * 2); // 2 or 3 bursts
 
