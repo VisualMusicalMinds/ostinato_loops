@@ -238,7 +238,7 @@
 
       // Master gain to control overall volume
       const masterGain = ctx.createGain();
-      masterGain.gain.value = 0.95; // 5% quieter
+      masterGain.gain.value = 0.75; //  quieter
 
       // Connect components to master gain
       noiseGain.connect(masterGain);
