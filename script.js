@@ -1496,6 +1496,8 @@ function createHandClap() {
     const pattern = activeStates.map(a => a ? 'B' : 'G').join('/');
     
     switch (rhythmSystem) {
+      case 'none':
+        return [];
       case 'fruit-rhythms':
         return getFruitRhythmText(pattern);
       case 'beat-centered-kodaly':
@@ -1797,6 +1799,7 @@ function createHandClap() {
   }
 
   // --- INITIALIZATION ---
+  lyricsDropdown.value = rhythmSystem;
   updatePoemMargin();
   window.addEventListener('resize', updatePoemMargin);
 
