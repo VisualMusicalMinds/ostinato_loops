@@ -144,7 +144,7 @@
   let BPM = 82;
   let textImportMode = 'replace'; // 'add' or 'replace'
   let savedTextInput = ''; // Store the text from the modal
-  let rhythmSystem = 'kodaly';
+  let rhythmSystem = 'simple-kodaly';
 
   // Audio context for generating sounds
   let audioContext = null;
@@ -1724,6 +1724,7 @@ function createHandClap() {
     // This function is overhauled for the new 4-line structure.
     updateSixteenthNoteButtonState();
 
+    container.dataset.rhythmSystem = rhythmSystem;
     container.innerHTML = '';
     notesBoxElements = [[], [], [], []]; // 2D array for 4 lines
     const config = getLayoutConfig();
