@@ -758,6 +758,5 @@ body { margin: 0; padding: 26px 0 0 0;  }
 }
 
 #poem[data-rhythm-system="takadimi-system"] .word {
-  font-family: 'Fira Sans', sans-serif;
-  font-size: 1.2em;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
