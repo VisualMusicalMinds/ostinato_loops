@@ -748,8 +748,8 @@ body { margin: 0; padding: 26px 0 0 0;  }
 }
 
 #poem[data-rhythm-system="fruit-rhythms"] .word {
-  font-family: 'Fira Sans', sans-serif;
-  font-size: 1.2em;
+  font-family: 'Caveat', cursive;
+  font-size: 1.4em;
 }
 
 #poem[data-rhythm-system="gordon-system"] .word {
@@ -758,6 +758,6 @@ body { margin: 0; padding: 26px 0 0 0;  }
 }
 
 #poem[data-rhythm-system="takadimi-system"] .word {
-  font-family: 'Archivo Narrow', sans-serif;
+  font-family: 'Fira Sans', sans-serif;
   font-size: 1.2em;
 }
