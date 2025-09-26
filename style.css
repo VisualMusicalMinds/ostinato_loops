@@ -748,17 +748,16 @@ body { margin: 0; padding: 26px 0 0 0;  }
 }
 
 #poem[data-rhythm-system="fruit-rhythms"] .word {
-  font-family: 'Six Caps', sans-serif;
-  font-size: 1.4em; /* Adjust size for narrow font */
-  font-weight: 400;
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 1.2em;
 }
 
 #poem[data-rhythm-system="gordon-system"] .word {
   font-family: 'Permanent Marker', cursive;
-  line-height: 1; /* Adjust line-height for marker font */
+  line-height: 1;
 }
 
 #poem[data-rhythm-system="takadimi-system"] .word {
-  font-family: 'Stick', sans-serif;
-  font-size: 1.2em; /* Adjust size for stick font */
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 1.2em;
 }
