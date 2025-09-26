@@ -740,3 +740,25 @@ body { margin: 0; padding: 26px 0 0 0;  }
 .control-button:has(> .lyrics-dropdown) {
   padding: 0;
 }
+
+/* Rhythm System Fonts */
+#poem[data-rhythm-system="simple-kodaly"] .word,
+#poem[data-rhythm-system="beat-centered-kodaly"] .word {
+  font-family: 'Lexend', sans-serif;
+}
+
+#poem[data-rhythm-system="fruit-rhythms"] .word {
+  font-family: 'Six Caps', sans-serif;
+  font-size: 1.4em; /* Adjust size for narrow font */
+  font-weight: 400;
+}
+
+#poem[data-rhythm-system="gordon-system"] .word {
+  font-family: 'Permanent Marker', cursive;
+  line-height: 1; /* Adjust line-height for marker font */
+}
+
+#poem[data-rhythm-system="takadimi-system"] .word {
+  font-family: 'Stick', sans-serif;
+  font-size: 1.2em; /* Adjust size for stick font */
+}
