@@ -75,7 +75,7 @@ body { margin: 0; padding: 26px 0 0 0;  }
     width: 101px;
 }
 .group.sixteenth .words {
-    width: 111px;
+    width: 104px;
 }
 .beat-bar-half {
   width: 50%;
@@ -88,8 +88,9 @@ body { margin: 0; padding: 26px 0 0 0;  }
 .words { 
   display: flex; 
   justify-content: space-between; 
-  width: 46px; 
+  width: 51px; 
   margin: 0 auto; 
+  transform: translateX(-3px);
 }
 .words.center-text {
   justify-content: center;
@@ -749,7 +750,7 @@ body { margin: 0; padding: 26px 0 0 0;  }
 
 #poem[data-rhythm-system="fruit-rhythms"] .word {
   font-family: 'Caveat', cursive;
-  font-size: 1.4em;
+  font-size: 1.3em;
 }
 
 #poem[data-rhythm-system="gordon-system"] .word {
