@@ -58,7 +58,7 @@ body { margin: 0; padding: 26px 0 0 0;  }
 .beat-bar {
   display: flex;
   height: 10px;
-  width: 46px;
+  width: 2.4em;
   background-color: #e0e0e0;
   border: 1px solid #c0c0c0;
   border-radius: 4px;
@@ -72,10 +72,10 @@ body { margin: 0; padding: 26px 0 0 0;  }
   pointer-events: none;
 }
 .group.sixteenth .beat-bar {
-    width: 101px;
+    width: 5.25em;
 }
 .group.sixteenth .words {
-    width: 104px;
+    width: 5.4em;
 }
 .beat-bar-half {
   width: 50%;
@@ -88,9 +88,9 @@ body { margin: 0; padding: 26px 0 0 0;  }
 .words { 
   display: flex; 
   justify-content: space-between; 
-  width: 51px; 
+  width: 2.65em; 
   margin: 0 auto; 
-  transform: translateX(-3px);
+  transform: translateX(-0.156em);
 }
 .words.center-text {
   justify-content: center;
